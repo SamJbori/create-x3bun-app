@@ -38,8 +38,15 @@ All tooling, scripts, and runtime assumptions are designed to work with **Bun** 
 - **State Management**  
   Powered by **[React Query](https://tanstack.com/query/latest)** for efficient server-state management, caching, and synchronization.
 
+- **Database**  
+  **NoSQL** has come a long way in terms of performance, and I use it almost exclusively in new projects—especially while the data shape is still evolving. Since everyone seems to be using **Prisma** with/or **PostgreSQL** these days, I decided to go with **MongoDB** instead. That said, you’re free to use **Prisma** or **Bun’s native PostgreSQL driver** if that’s more your thing.
+
+
 - **Storage**  
   Uses **[S3-compatible storage](https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html)**, ensuring compatibility with a wide range of cloud and self-hosted storage providers.
+
+- **TypeScript**  
+  Because you should!
 
 ### Usage
 
@@ -52,12 +59,26 @@ bun create x3bun-app <ProjectName>
 # Run VS Code into the project folder
 code <ProjectName>
 ```
+### So... what is ~~`create-t3-app`~~ `create-x3bun-app`? A template?
 
-### Why
+Inspired by `create-t3-app`, this is a CLI—but unlike it, it’s built by a *not-so-seasoned* dev (three-letter abbreviations are more than I deserve 😄).
 
-To Be Updated...
+While the **T3 Stack** is a great template that I’ve used frequently, I found it a bit too geared toward **Next.js** for my taste, and it’s missing what I consider a core component: **mobile**.
 
-<a href="https://github.com/SamJbori/create-x3bun-app/graphs/contributors">
+I’m a firm believer that **PWAs** are the future of mobile development—once the iFamily catches up to the 21st century. Until then, we’re stuck maintaining a separate mobile codebase… or are we?
+
+So here we are: another template, another CLI, another day.
+
+I decided to completely move away from **[Next.js](https://nextjs.org/) on the backend** and use **[Hono](https://hono.dev/)** instead. It’s lighter, simpler, and far less troublesome to run on **Cloudflare Workers**.  
+For the web frontend, I still went with **Next.js**, while keeping an eye on **TanStack Start**. **Tailwind CSS** was a no-brainer for the web.
+
+For mobile, I chose **[Expo](https://expo.dev/) (React Native)**. I’m not fully sold on using Tailwind outside the web, but I *do* like using Expo as a glorified web browser—it’s especially useful for **SSR/ISR** scenarios. That said, you’re free to pick whatever strategy works best for you.
+
+Needless to say, **“opinionated”** feels like a fair characterization of this project.
+
+
+### Contributors
+<a href="https://github.com/SamJbori/create-x3bun-app/graphs/contributors" align="center">
 	<p align="center">
 		<img src="https://contrib.rocks/image?repo=SamJbori/create-x3bun-app" alt="A table of avatars from the project's contributors"/>
 	</p>

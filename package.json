@@ -1,6 +1,28 @@
 {
   "name": "create-x3bun-app",
   "version": "0.1.2",
+  "description": "Quickest way to start a new web/mobile app with full stack typesafety",
+  "author": "Sam Jbori <sam.jbori@outlook.com> (https://jbori.net)",
+  "maintainers": [
+    "Sam Jbori <sam.jbori@outlook.com> (https://jbori.net)"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SamJbori/create-x3bun-app.git"
+  },
+  "keywords": [
+    "create-x3bun-app",
+    "create-t3-app",
+    "nextjs",
+    "next.js",
+    "x3bun-stack",
+    "t3-stack",
+    "tailwind",
+    "tRPC",
+    "typescript",
+    "bun"
+  ],
   "type": "module",
   "bin": {
     "create-x3bun-app": "./src/index.ts"
