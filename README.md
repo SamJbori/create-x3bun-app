@@ -56,23 +56,28 @@ Create a new project using the interactive CLI:
 # Create a new X3Bun app
 bun create x3bun-app <ProjectName>
 
+# Remember to populate `.env` properly, use `.env.example` as a reference
 # Run VS Code into the project folder
 code <ProjectName>
+
+# or
+cd <ProjectName>
+bun run dev
 ```
 ### **So... what is ~~`create-t3-app`~~ `create-x3bun-app`? A template?**
 
-Inspired by `create-t3-app`, this is a CLI—but unlike it, it’s built by a *not-so-seasoned* dev (three-letter abbreviations are more than I deserve 😄).
+Inspired by `create-t3-app`, this is a CLI—but unlike it, it’s built by a *not-so-seasoned* dev (three-letter abbreviations are more than I deserve 😊).
 
-While the **T3 Stack** is a great template that I’ve used frequently, I found it a bit too geared toward **Next.js** for my taste, and it’s missing what I consider a core component: **mobile**.
+While the **T3 Stack** is a great template that I’ve used frequently, I found it a bit too geared toward **Next.js** for my taste, and missing what I consider a core component: **mobile**.
 
-I’m a firm believer that **PWAs** are the future of mobile development—once the iFamily catches up to the 21st century. Until then, we’re stuck maintaining a separate mobile codebase… or are we?
+I’m a firm believer that **PWAs** are the future of mobile development—once the iFamily catches up to the 21st century (they were busy adding a calculator app). Until then, we’re stuck maintaining a separate mobile codebase… or are we?
 
 So here we are: another template, another CLI, another day.
 
-I decided to completely move away from **[Next.js](https://nextjs.org/) on the backend** and use **[Hono](https://hono.dev/)** instead. It’s lighter, simpler, and far less troublesome to run on **Cloudflare Workers**.  
-For the web frontend, I still went with **Next.js**, while keeping an eye on **TanStack Start**. **Tailwind CSS** was a no-brainer for the web.
+First, Serverless computing and CPU Time billing encouraged me to evaluate and compare between the current runtimes available seeking performance and efficiency, finally after much consideration I decided to go with something Taylor Swift never had, **Bun**. Next I decided not to use **[Next](https://nextjs.org/) on the backend** and use **[Hono](https://hono.dev/)** instead. It’s lighter, simpler, and far less troublesome to run on **Cloudflare Workers** or any other cloud/enviornment.
+For the web frontend, I kept **Next.js**, while keeping an eye on **TanStack Start**. **Tailwind CSS** was (arguably) a no-brainer for the web so it's baked-in from the start.
 
-For mobile, I chose **[Expo](https://expo.dev/) (React Native)**. I’m not fully sold on using Tailwind outside the web, but I *do* like using Expo as a glorified web browser—it’s especially useful for **SSR/ISR** scenarios. That said, you’re free to pick whatever strategy works best for you.
+For mobile, I chose **[Expo](https://expo.dev/) ([React Native](https://reactnative.dev/))**. I’m not fully sold on using Tailwind outside the web so I didn't include it in my mobile codebase, but I *do* like using Expo as a glorified web browser—this is especially useful for **SSR/ISR** scenarios. Needless to say, **Expo** is far more capable,  so use it as you see fit.
 
 Needless to say, **“opinionated”** feels like a fair characterization of this project.
 

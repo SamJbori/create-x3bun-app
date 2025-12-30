@@ -17,10 +17,10 @@
     "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
-    "eslint": "9.39.2",
-    "prettier": "3.7.4",
-    "turbo": "2.7.2",
-    "typescript": "5.9.2"
+    "eslint": "config",
+    "prettier": "config",
+    "turbo": "config",
+    "typescript": "config"
   },
   "engines": {
     "node": ">=22"
