@@ -39,7 +39,7 @@ All tooling, scripts, and runtime assumptions are designed to work with **Bun** 
   Powered by **[React Query](https://tanstack.com/query/latest)** for efficient server-state management, caching, and synchronization.
 
 - **Database**  
-  **NoSQL** has come a long way in terms of performance, and I use it almost exclusively in new projects—especially while the data shape is still evolving. Since everyone seems to be using **Prisma** with/or **PostgreSQL** these days, I decided to go with **MongoDB** instead. That said, you’re free to use **Prisma** or **Bun’s native PostgreSQL driver** if that’s more your thing.
+  **NoSQL** has come a long way in terms of performance, and I use it almost exclusively in new projects—especially while the data shape is still evolving. Since everyone seems to be using **[Prisma](https://www.prisma.io/)** or **[Drizzle](https://orm.drizzle.team/)** with/or **[PostgreSQL](https://www.postgresql.org/)** these days, I decided to go with **[MongoDB](https://www.mongodb.com/)** instead just to show some diversity and show how I make **NoSQL** fun again. That said, you’re free to use **Prisma**, **Drizzle**, or **Bun’s native PostgreSQL driver** if that’s more your thing, finding resources on how to do that won't be hard.
 
 
 - **Storage**  
