@@ -1,0 +1,48 @@
+name: Publish create-x3bun-app
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "create-x3bun-app@*"
+      # alternatively use:
+      # - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "latest"
+
+      - name: Configure npm auth
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Install (repo)
+        run: bun install --frozen-lockfile
+
+      # Optional sanity checks (recommended)
+      - name: Pack + verify includes config.json
+        run: |
+          cd packages/create-x3bun-app
+          bun pm pack
+          tar -tf create-x3bun-app-*.tgz | grep -q "package/config.json"
+
+      - name: Publish
+        run: |
+          cd packages/create-x3bun-app
+          bun publish --access public
+        env:
+          NPM_CONFIG_PROVENANCE: "false"

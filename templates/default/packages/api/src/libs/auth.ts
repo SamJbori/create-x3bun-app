@@ -34,7 +34,7 @@ export const initAuth = (dbClient: MongoClient) => {
     },
     trustedOrigins: (request) => {
       // Return an array of trusted origins based on the request
-      const origin = request.headers.get("origin");
+      const origin = request?.headers.get("origin");
 
       return [origin ?? ""];
     },
@@ -100,7 +100,7 @@ export const initAuth = (dbClient: MongoClient) => {
             ? undefined
             : ["/phone-number/send-otp"],
       }),
-    ],
+    ] as BetterAuthOptions["plugins"],
     onAPIError: {
       onError(error, ctx) {
         console.error("BETTER AUTH API ERROR", error, ctx);
