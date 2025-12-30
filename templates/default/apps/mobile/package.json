@@ -1,0 +1,50 @@
+{
+  "name": "@x3bun/mobile",
+  "main": "expo-router/entry",
+  "version": "0.0.0",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "lint": "expo lint"
+  },
+  "dependencies": {
+    "@expo/vector-icons": "config",
+    "@react-navigation/bottom-tabs": "config",
+    "@react-navigation/elements": "config",
+    "@react-navigation/native": "config",
+    "expo": "config",
+    "expo-constants": "config",
+    "expo-font": "config",
+    "expo-haptics": "config",
+    "expo-image": "config",
+    "expo-linking": "config",
+    "expo-router": "config",
+    "expo-splash-screen": "config",
+    "expo-status-bar": "config",
+    "expo-symbols": "config",
+    "expo-system-ui": "config",
+    "expo-web-browser": "config",
+    "react": "config",
+    "react-dom": "config",
+    "react-native": "config",
+    "react-native-gesture-handler": "config",
+    "react-native-reanimated": "config",
+    "react-native-safe-area-context": "config",
+    "react-native-screens": "config",
+    "react-native-web": "config",
+    "react-native-worklets": "config"
+  },
+  "devDependencies": {
+    "@ianvs/prettier-plugin-sort-imports": "config",
+    "@types/react": "config",
+    "@x3bun/prettier": "workspace:*",
+    "eslint": "config",
+    "eslint-config-expo": "config",
+    "prettier-plugin-tailwindcss": "config",
+    "typescript": "config"
+  },
+  "private": true,
+  "prettier": "@x3bun/prettier/next"
+}
