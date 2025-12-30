@@ -2,17 +2,16 @@
 import { existsSync } from "node:fs";
 import { mkdir, readdir, readFile, stat, writeFile, cp } from "node:fs/promises";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 type StarterConfig = {
   templateScope: string; // e.g. "x3bun" (without "@")
   packages: Record<string, string>;
 };
 
-function getArgProjectName(): string | undefined {
-  const args = process.argv.slice(2);
-  return args.find((a) => a && !a.startsWith("-"))?.trim() || undefined;
-}
-
+/**
+ * Asserts that the script is running in Bun environment.
+ */
 function assertRunningOnBun() {
   const isBun = typeof (process as any).versions?.bun === "string";
   const ua = process.env.npm_config_user_agent ?? "";
@@ -24,13 +23,30 @@ function assertRunningOnBun() {
   }
 }
 
+/**
+ * Retrieves the project name from command-line arguments.
+ * @returns Project Name
+ */
+function getArgProjectName(): string | undefined {
+  const args = process.argv.slice(2);
+  return args.find((a) => a && !a.startsWith("-"))?.trim() || undefined;
+}
+
+/**
+ *
+ * @param label Prompt message
+ * @param defaultValue default value if input is empty
+ * @returns Project name
+ */
 async function promptText(label: string, defaultValue?: string) {
   const p = `${label}${defaultValue ? ` (${defaultValue})` : ""}: `;
   const value = (prompt(p) ?? "").trim();
   return value || defaultValue || "";
 }
 
-// Strict-ish npm package name validation for root package name / scope suffix.
+/**
+ * Strict-ish npm package name validation for root package name / scope suffix.
+ */
 function normalizeProjectName(input: string) {
   const v = input.trim();
   const ok = /^[a-z0-9][a-z0-9._-]*$/.test(v);
@@ -38,6 +54,7 @@ function normalizeProjectName(input: string) {
   return v;
 }
 
+/** Copy template to Project directory */
 async function copyTemplate(templateDir: string, destDir: string) {
   await cp(templateDir, destDir, {
     recursive: true,
@@ -46,6 +63,37 @@ async function copyTemplate(templateDir: string, destDir: string) {
   });
 }
 
+/** Modify the root `package.json` package `name` */
+async function setRootPackageName(rootDir: string, newRootName: string) {
+  const rootPkgPath = path.join(rootDir, "package.json");
+  const raw = await readFile(rootPkgPath, "utf8");
+  const json = JSON.parse(raw);
+  json.name = newRootName;
+  await writeFile(rootPkgPath, JSON.stringify(json, null, 2) + "\n", "utf8");
+}
+
+function rewriteDepsSectionKeys(
+  section: Record<string, string> | undefined,
+  fromScopeWithSlash: string,
+  toScopeWithSlash: string
+) {
+  if (!section) return section;
+
+  const out: Record<string, string> = {};
+  for (const [pkg, ver] of Object.entries(section)) {
+    const newKey = pkg.startsWith(fromScopeWithSlash)
+      ? pkg.replace(fromScopeWithSlash, toScopeWithSlash)
+      : pkg;
+    out[newKey] = ver;
+  }
+  return out;
+}
+
+/**
+ * Find all files recursively in a directory, excluding node_modules, .git, .turbo
+ * @param rootDir Project root directory
+ * @returns Files paths
+ */
 async function findAllFiles(rootDir: string) {
   const results: string[] = [];
 
@@ -71,36 +119,23 @@ async function findAllFiles(rootDir: string) {
   return results;
 }
 
+/**
+ * Find all package.json files in the project
+ * @param rootDir Project root directory
+ * @returns all paths to package.json files
+ */
 async function findAllPackageJsonFiles(rootDir: string) {
   const all = await findAllFiles(rootDir);
   return all.filter((p) => path.basename(p) === "package.json");
 }
 
-function rewriteDepsSectionKeys(
-  section: Record<string, string> | undefined,
-  fromScopeWithSlash: string,
-  toScopeWithSlash: string
-) {
-  if (!section) return section;
-
-  const out: Record<string, string> = {};
-  for (const [pkg, ver] of Object.entries(section)) {
-    const newKey = pkg.startsWith(fromScopeWithSlash)
-      ? pkg.replace(fromScopeWithSlash, toScopeWithSlash)
-      : pkg;
-    out[newKey] = ver;
-  }
-  return out;
-}
-
-async function setRootPackageName(rootDir: string, newRootName: string) {
-  const rootPkgPath = path.join(rootDir, "package.json");
-  const raw = await readFile(rootPkgPath, "utf8");
-  const json = JSON.parse(raw);
-  json.name = newRootName;
-  await writeFile(rootPkgPath, JSON.stringify(json, null, 2) + "\n", "utf8");
-}
-
+/**
+ * Change all scoped package names from template scope to project scope
+ * for example `x3bun` to `myx3bun`
+ * @param rootDir Project root directory
+ * @param projectName Project Name
+ * @param templateScope original scope ex `x3bun
+ */
 async function applyRepoScope(
   rootDir: string,
   projectName: string,
@@ -220,6 +255,12 @@ function sortObjectKeys<T extends Record<string, any> | undefined>(obj: T): T {
       return acc;
     }, {} as Record<string, any>) as T;
 }
+
+/**
+ * Update all package.json files dependencies to apply versions from config
+ * @param rootDir Project root directort
+ * @param config config file
+ */
 async function applyVersions(rootDir: string, config: StarterConfig) {
   const packageJsonFiles = await findAllPackageJsonFiles(rootDir);
 
@@ -245,11 +286,18 @@ async function applyVersions(rootDir: string, config: StarterConfig) {
   }
 }
 
+/**
+ * Main Section
+ * --------------------------------------------------
+ * Creates a new x3bun starter project in a new folder.
+ * --------------------------------------------------
+ */
 async function main() {
   assertRunningOnBun();
 
   const argProjectName = getArgProjectName();
 
+  // Prompt for project name if not provided as argument
   const projectNameRaw =
     argProjectName ??
     (await promptText("Project name (root package name)", "myx3bun"));
@@ -263,18 +311,34 @@ async function main() {
     process.exit(1);
   }
 
+  /** Project directory */
   const destDir = path.resolve(process.cwd(), projectName);
+
+  // Check if folder exists
   if (existsSync(destDir)) {
+    // Folder exists
     console.error(`❌ Folder already exists: ${destDir}`);
+
+    // Exit with error
     process.exit(1);
   }
+
+  // Create project folder
   await mkdir(destDir, { recursive: true });
 
-  const here = path.dirname(new URL(import.meta.url).pathname);
+  /** Current script directory */
+  const here = path.dirname(fileURLToPath(import.meta.url));
+
+  /** Template directory */
   const templateDir = path.resolve(here, "../templates/default");
+
+  /** Config File path */
   const configPath = path.resolve(here, "../config.json");
 
+  // Load config
   const configRaw = await readFile(configPath, "utf8");
+
+  /** Config Object */
   const config: StarterConfig = JSON.parse(configRaw);
 
   if (!config.templateScope || /[^a-z0-9._-]/.test(config.templateScope)) {

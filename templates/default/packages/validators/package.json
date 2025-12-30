@@ -1,0 +1,44 @@
+{
+  "name": "@x3bun/validators",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./db": {
+      "import": "./dist/db.js",
+      "types": "./dist/db.d.ts"
+    },
+    "./post": {
+      "import": "./dist/post.js",
+      "types": "./dist/post.d.ts"
+    }
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "exports": "bun run exportupdate.ts",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "lint": "eslint --flag unstable_native_nodejs_ts_config",
+    "typecheck": "tsc --noEmit",
+    "typegen": "tsc --emitDeclarationOnly"
+  },
+  "devDependencies": {
+    "@ianvs/prettier-plugin-sort-imports": "config",
+    "@types/bun": "config",
+    "@types/node": "config",
+    "@x3bun/eslint": "workspace:*",
+    "@x3bun/prettier": "workspace:*",
+    "@x3bun/typescript": "workspace:*",
+    "typescript": "config"
+  },
+  "peerDependencies": {
+    "bun": "config",
+    "zod": "config"
+  },
+  "prettier": "@x3bun/prettier/base"
+}

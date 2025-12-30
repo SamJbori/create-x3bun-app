@@ -1,0 +1,25 @@
+{
+  "name": "@x3bun/prettier",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./base.js",
+    "./base": "./base.js",
+    "./next": "./next.js"
+  },
+  "scripts": {
+    "clean": "git clean -xdf .cache .turbo node_modules",
+    "format": "prettier --check . --ignore-path ../../.gitignore"
+  },
+  "dependencies": {
+    "@ianvs/prettier-plugin-sort-imports": "config",
+    "prettier": "config",
+    "prettier-plugin-tailwindcss": "config"
+  },
+  "devDependencies": {
+    "@types/node": "config",
+    "@x3bun/typescript": "workspace:*"
+  },
+  "prettier": "@x3bun/prettier/base"
+}

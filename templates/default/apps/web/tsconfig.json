@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@x3bun/typescript/nextjs.json",
+  "compilerOptions": {
+    "target": "ES2017",
+    // "lib": ["dom", "dom.iterable", "esnext"],
+    // "resolveJsonModule": true,
+    // "isolatedModules": true,
+    // "incremental": true,
+    "baseUrl": ".",
+    "paths": {
+      "@libs/*": ["./src/libs/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@hooks/*": ["./src/hooks/*"],
+      "@c/*": ["./src/componsnts/*"],
+      "@/*": ["./*"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "**/*.mts",
+    "eslint.config.ts"
+  ],
+  "exclude": ["node_modules"]
+}

@@ -1,0 +1,47 @@
+{
+  "name": "@x3bun/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "lint": "eslint --flag unstable_native_nodejs_ts_config",
+    "typecheck": "tsc --noEmit",
+    "typegen": "tsc --emitDeclarationOnly"
+  },
+  "dependencies": {
+    "@trpc/server": "config",
+    "@x3bun/validators": "workspace:*",
+    "better-auth": "config",
+    "superjson": "config"
+  },
+  "devDependencies": {
+    "@ianvs/prettier-plugin-sort-imports": "4.7.0",
+    "@types/bun": "1.3.4",
+    "@types/lodash-es": "4.17.12",
+    "@x3bun/eslint": "workspace:*",
+    "@x3bun/prettier": "workspace:*",
+    "@x3bun/typescript": "workspace:*",
+    "typescript": "5.9.2"
+  },
+  "peerDependencies": {
+    "@t3-oss/env-core": "0.13.10",
+    "bun": "1.3.4",
+    "mongodb": "7.0.0",
+    "zod": "4.2.1"
+  },
+  "prettier": "@x3bun/prettier/base"
+}

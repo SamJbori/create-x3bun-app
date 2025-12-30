@@ -1,0 +1,45 @@
+{
+  "name": "@x3bun/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "bun run --bun --env-file=../../.env next build",
+    "dev": "bun run --bun --env-file=../../.env  next dev",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "lint": "bun run --bun --env-file=../../.env next typegen && eslint",
+    "start": "bun run --bun --env-file=../../.env next start",
+    "typecheck": "bun run --bun --env-file=../../.env next typegen && tsc --noEmit",
+    "typegen": "bun run --bun --env-file=../../.env next typegen"
+  },
+  "dependencies": {
+    "@t3-oss/env-nextjs": "config",
+    "@tanstack/react-query": "config",
+    "@trpc/client": "config",
+    "@trpc/react-query": "config",
+    "better-auth": "config",
+    "bun": "config",
+    "next": "config",
+    "react": "config",
+    "react-dom": "config",
+    "server-only": "config",
+    "superjson": "config",
+    "zod": "config"
+  },
+  "devDependencies": {
+    "@ianvs/prettier-plugin-sort-imports": "config",
+    "@tailwindcss/postcss": "config",
+    "@tanstack/react-query-devtools": "config",
+    "@types/bun": "config",
+    "@types/node": "config",
+    "@types/react": "config",
+    "@types/react-dom": "config",
+    "@x3bun/api": "workspace:*",
+    "@x3bun/eslint": "workspace:*",
+    "@x3bun/prettier": "workspace:*",
+    "@x3bun/typescript": "workspace:*",
+    "prettier-plugin-tailwindcss": "config",
+    "tailwindcss": "config",
+    "typescript": "config"
+  },
+  "prettier": "@x3bun/prettier/next"
+}

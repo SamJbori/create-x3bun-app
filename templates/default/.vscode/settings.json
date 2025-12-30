@@ -1,0 +1,9 @@
+{
+  "eslint.workingDirectories": [
+    {
+      "mode": "auto"
+    }
+  ],
+  "prettier.prettierPath": "node_modules/prettier",
+  "npm.packageManager": "bun"
+}
