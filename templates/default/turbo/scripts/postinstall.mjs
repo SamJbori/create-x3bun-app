@@ -10,12 +10,13 @@ import {
 import { resolve } from "node:path";
 import { createInterface } from "node:readline";
 
+// Skip hook setup in non-git directories
+if (!existsSync(".git")) {
+  console.log("⚠️  Not a git repository. Skipping hook setup.");
+  process.exit(0);
+}
 // 🏭 Skip hook setup in CI or production builds
-if (
-  process.env.CI === "true" ||
-  process.env.NODE_ENV === "production" ||
-  !existsSync(".git")
-) {
+if (process.env.CI === "true" || process.env.NODE_ENV === "production") {
   console.log("🏭 Skipping git hook setup (CI/build environment).");
   process.exit(0);
 }

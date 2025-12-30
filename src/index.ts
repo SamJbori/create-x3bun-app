@@ -3,11 +3,79 @@ import { existsSync } from "node:fs";
 import { mkdir, readdir, readFile, stat, writeFile, cp } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { spawnSync } from "node:child_process";
 
 type StarterConfig = {
   templateScope: string; // e.g. "x3bun" (without "@")
   packages: Record<string, string>;
 };
+
+type CliFlags = {
+  yes: boolean;
+  git?: boolean; // undefined = not specified, true = --git, false = --no-git
+  help: boolean;
+};
+
+/**
+ * Run a command inside a working directory (cross-platform).
+ * - Uses `shell: true` on Windows so `git` / `bun` resolve reliably.
+ */
+function run(cmd: string, args: string[], cwd: string, silent: boolean = false) {
+  const result = spawnSync(cmd, args, {
+    cwd,
+    stdio: silent ? "ignore" : "inherit",
+    shell: process.platform === "win32", // important for Windows
+  });
+
+  if (result.status !== 0) {
+    throw new Error(`Command failed: ${cmd} ${args.join(" ")}`);
+  }
+}
+
+/**
+ * Parse CLI flags:
+ * --yes / -y
+ * --git
+ * --no-git
+ * --help / -h
+ */
+function parseFlags(): CliFlags {
+  const args = process.argv.slice(2);
+
+  const help = args.includes("--help") || args.includes("-h");
+  const yes = args.includes("--yes") || args.includes("-y");
+
+  const hasGit = args.includes("--git");
+  const hasNoGit = args.includes("--no-git");
+
+  let git: boolean | undefined = undefined;
+  if (hasGit) git = true;
+  if (hasNoGit) git = false; // override
+
+  return { yes, git, help };
+}
+
+/** Print CLI help */
+function printHelp() {
+  console.log(`
+create-x3bun-app
+
+Usage:
+  bunx create x3bun-app [projectName] [options]
+  bunx create-x3bun-app [projectName] [options]
+
+Options:
+  --yes, -y       Skip prompts and use defaults (git init + bun install)
+  --git           Force git init
+  --no-git        Skip git init (wins over --git/--yes)
+  --help, -h      Show this help
+
+Examples:
+  bunx create x3bun-app myx3bun
+  bunx create x3bun-app myx3bun --yes
+  bunx create x3bun-app myx3bun --no-git
+`);
+}
 
 /**
  * Asserts that the script is running in Bun environment.
@@ -295,12 +363,27 @@ async function applyVersions(rootDir: string, config: StarterConfig) {
 async function main() {
   assertRunningOnBun();
 
+  // CLI flags
+  const flags = parseFlags();
+  if (flags.help) {
+    printHelp();
+    process.exit(0);
+  }
+
   const argProjectName = getArgProjectName();
 
   // Prompt for project name if not provided as argument
+  // If --yes is provided and no arg name, use default "myx3bun"
+  if (flags.yes && !argProjectName) {
+    console.log(
+      "⚠️  --yes provided without project name, using default: myx3bun"
+    );
+  }
   const projectNameRaw =
     argProjectName ??
-    (await promptText("Project name (root package name)", "myx3bun"));
+    (flags.yes
+      ? "myx3bun"
+      : await promptText("Project name (root package name)", "myx3bun"));
 
   const projectName = normalizeProjectName(projectNameRaw);
 
@@ -359,12 +442,66 @@ async function main() {
   // Replace "config" versions in all package.json files (and resolutions if you use it)
   await applyVersions(destDir, config);
 
+  // Decide if bun install should run (priority: --yes > prompt)
+  let shouldInstall: boolean;
+  if (flags.yes) {
+    shouldInstall = true;
+  } else {
+    const installAnswer = (
+      await promptText("Install dependencies now? (Y/n)", "Y")
+    ).toLowerCase();
+
+    shouldInstall =
+      installAnswer === "y" || installAnswer === "yes" || installAnswer === "";
+  }
+
+  if (shouldInstall) {
+    try {
+      run("bun", ["install"], destDir);
+      console.log("✅ Dependencies installed");
+    } catch (err) {
+      console.warn(
+        "⚠️  Dependency installation failed. You can run `bun install` manually."
+      );
+    }
+  }
+
+  // Decide if git should initialize (priority: --no-git > --git > --yes > prompt)
+  let shouldInitGit: boolean;
+
+  if (flags.git === false) {
+    shouldInitGit = false;
+  } else if (flags.git === true) {
+    shouldInitGit = true;
+  } else if (flags.yes) {
+    shouldInitGit = true;
+  } else {
+    const gitAnswer = (
+      await promptText("Initialize git repository? (Y/n)", "Y")
+    ).toLowerCase();
+
+    shouldInitGit = gitAnswer === "y" || gitAnswer === "yes" || gitAnswer === "";
+  }
+
+  if (shouldInitGit) {
+    try {
+      run("git", ["init", "-q"], destDir, true);
+
+      // Optional initial commit (comment out if you don’t want it)
+      run("git", ["add", "."], destDir, true);
+      run("git", ["commit", "-m", "Initial commit", "--quiet"], destDir, true);
+      console.log("✅ Git repository initialized");
+    } catch (err) {
+      console.warn("⚠️  Git initialization failed:", (err as Error).message);
+    }
+  }
+
   console.log(`✅ Created ${projectName}`);
   console.log(`✅ Root package name: ${projectName}`);
   console.log(`✅ Workspace scope: @${projectName}/*`);
   console.log(`Next:`);
   console.log(`  cd ${projectName}`);
-  console.log(`  bun install`);
+  if (!shouldInstall) console.log(`  bun install`);
   console.log(`  bun run dev`);
 }
 
