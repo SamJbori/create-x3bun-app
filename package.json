@@ -8,7 +8,7 @@
   "files": [
     "src",
     "templates",
-    "versions.json"
+    "config.json"
   ],
   "devDependencies": {
     "@types/bun": "1.3.4",
