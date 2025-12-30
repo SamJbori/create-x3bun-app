@@ -48,7 +48,7 @@ All tooling, scripts, and runtime assumptions are designed to work with **Bun** 
 - **TypeScript**  
   Because you should!
 
-### Usage
+### **Usage**
 
 Create a new project using the interactive CLI:
 
@@ -59,7 +59,7 @@ bun create x3bun-app <ProjectName>
 # Run VS Code into the project folder
 code <ProjectName>
 ```
-### So... what is ~~`create-t3-app`~~ `create-x3bun-app`? A template?
+### **So... what is ~~`create-t3-app`~~ `create-x3bun-app`? A template?**
 
 Inspired by `create-t3-app`, this is a CLI—but unlike it, it’s built by a *not-so-seasoned* dev (three-letter abbreviations are more than I deserve 😄).
 
@@ -77,7 +77,7 @@ For mobile, I chose **[Expo](https://expo.dev/) (React Native)**. I’m not full
 Needless to say, **“opinionated”** feels like a fair characterization of this project.
 
 
-### Contributors
+### **Contributors**
 <a href="https://github.com/SamJbori/create-x3bun-app/graphs/contributors" align="center">
 	<p align="center">
 		<img src="https://contrib.rocks/image?repo=SamJbori/create-x3bun-app" alt="A table of avatars from the project's contributors"/>
