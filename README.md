@@ -7,6 +7,8 @@
 
 An opinionated template for high performance apps, build to use **[Bun](https://bun.sh/)**
 
+### **Work In Progress...**
+
 ### **Runtime**
 
 Due to its high performance and excellent developer experience, this stack is built **exclusively on [Bun](https://bun.sh/)**.  
