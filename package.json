@@ -1,6 +1,6 @@
 {
   "name": "create-x3bun-app",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Quickest way to start a new web/mobile app with full stack typesafety",
   "author": "Sam Jbori <sam.jbori@outlook.com> (https://jbori.net)",
   "maintainers": [
