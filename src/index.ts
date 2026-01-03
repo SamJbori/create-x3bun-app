@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
-import { existsSync } from "node:fs";
+import { existsSync, renameSync } from "node:fs";
 import { mkdir, readdir, readFile, stat, writeFile, cp } from "node:fs/promises";
-import path from "node:path";
+import path, { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 
@@ -129,6 +129,10 @@ async function copyTemplate(templateDir: string, destDir: string) {
     force: false,
     errorOnExist: true,
   });
+
+  if (existsSync(join(destDir, "_gitignore"))) {
+    renameSync(join(destDir, "_gitignore"), join(destDir, ".gitignore"));
+  }
 }
 
 /** Modify the root `package.json` package `name` */

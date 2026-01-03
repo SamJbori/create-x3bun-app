@@ -1,6 +1,6 @@
 {
   "name": "create-x3bun-app",
-  "version": "0.1.4",
+  "version": "0.1.6",
   "description": "Quickest way to start a new web/mobile app with full stack typesafety",
   "author": "Sam Jbori <sam.jbori@outlook.com> (https://jbori.net)",
   "maintainers": [
@@ -11,6 +11,7 @@
     "type": "git",
     "url": "https://github.com/SamJbori/create-x3bun-app.git"
   },
+  "homepage": "https://github.com/SamJbori/create-x3bun-app#readme",
   "keywords": [
     "create-x3bun-app",
     "create-t3-app",
@@ -21,7 +22,16 @@
     "tailwind",
     "tRPC",
     "typescript",
-    "bun"
+    "bun",
+    "expo",
+    "react-native",
+    "react",
+    "web",
+    "mobile",
+    "fullstack",
+    "typescript",
+    "starter",
+    "template"
   ],
   "type": "module",
   "bin": {
