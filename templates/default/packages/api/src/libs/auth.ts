@@ -1,5 +1,5 @@
 import type { DBCollections } from "@x3bun/validators/db";
-import type { BetterAuthOptions, InferSession, InferUser } from "better-auth";
+import type { BetterAuthOptions } from "better-auth";
 import type { MongoClient } from "mongodb";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { betterAuth } from "better-auth/minimal";
@@ -111,8 +111,8 @@ export const initAuth = (dbClient: MongoClient) => {
   return betterAuth({ ...authConfig });
 };
 export type Auth = ReturnType<typeof initAuth>;
-export type Session = InferSession<Auth>;
-export type User = InferUser<Auth>;
+export type Session = Auth["$Infer"]["Session"]["session"];
+export type User = Auth["$Infer"]["Session"]["user"];
 export type AuthData = {
   session: Session;
   user: User;

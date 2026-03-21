@@ -1,6 +1,6 @@
 {
   "name": "create-x3bun-app",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Quickest way to start a new web/mobile app with full stack typesafety",
   "author": "Sam Jbori <sam.jbori@outlook.com> (https://jbori.net)",
   "maintainers": [
@@ -43,10 +43,10 @@
     "config.json"
   ],
   "devDependencies": {
-    "@types/bun": "1.3.4",
+    "@types/bun": "1.3.11",
     "@types/node": "^22"
   },
   "engines": {
-    "bun": "1.3.4"
+    "bun": "1.3.11"
   }
 }
