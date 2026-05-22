@@ -193,7 +193,7 @@ version updates will be applied as needed.
 
 <a href="https://github.com/SamJbori/create-x3bun-app/graphs/contributors" align="center">
 	<p align="center">
-		<img src="https://contrib.rocks/image?repo=SamJbori/create-x3bun-app" alt="A table of avatars from the project's contributors"/>
+		<img src="https://contrib.rocks/image?repo=SamJbori/create-x3bun-app" alt="A table of avatars from the project's contributors" align="center"/>
 	</p>
 </a>
 
