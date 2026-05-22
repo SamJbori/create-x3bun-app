@@ -1,5 +1,0 @@
-{
-  "extends": "@x3bun/typescript/base.json",
-  "include": ["."],
-  "exclude": ["node_modules"]
-}

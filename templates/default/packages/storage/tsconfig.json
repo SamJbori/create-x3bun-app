@@ -1,0 +1,4 @@
+{
+	"extends": "@x3bun/typescript/server",
+	"include": ["src", "../db/src/mongo.ts"]
+}

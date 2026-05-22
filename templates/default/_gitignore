@@ -43,7 +43,7 @@ yarn-error.log*
 
 # local env files
 .env
-.env*.local
+*.local
 
 # vercel
 .vercel
@@ -60,3 +60,11 @@ dist/
 
 # by WJ
 Backup
+
+dist-ssr
+
+.tanstack
+.wrangler
+.vinxi
+__unconfig*
+todos.json

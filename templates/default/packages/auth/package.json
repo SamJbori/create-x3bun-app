@@ -1,0 +1,25 @@
+{
+	"name": "@x3bun/auth",
+	"type": "module",
+	"private": true,
+	"exports": {
+		".": "./src/_index.ts"
+	},
+	"scripts": {
+		"format": "biome format .",
+		"format:fix": "biome format . --write",
+		"lint": "biome check .",
+		"lint:fix": "biome check . --write",
+		"typecheck": "tsc --noEmit"
+	},
+	"devDependencies": {
+		"@types/bun": "latest",
+		"@x3bun/typescript": "workspace:*"
+	},
+	"dependencies": {
+		"@x3bun/env": "workspace:*",
+		"better-auth": "^1.6.11",
+		"mongodb": "^7.2.0",
+		"zod": "^4.4.3"
+	}
+}

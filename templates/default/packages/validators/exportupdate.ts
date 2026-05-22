@@ -1,6 +1,6 @@
 // scripts/update-exports.ts
-import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
-import { join, relative } from "node:path";
+import { readdirSync, readFileSync, statSync, writeFileSync } from "fs";
+import { join, relative } from "path";
 
 interface MyPackageJson {
   name: string;
@@ -46,8 +46,7 @@ function updateExports() {
     const key = rel === "index" ? "." : `./${rel}`;
 
     exportsMap[key] = {
-      import: `./dist/${rel}.js`,
-      types: `./dist/${rel}.d.ts`,
+      import: `./src/${rel}.ts`,
     };
   }
 

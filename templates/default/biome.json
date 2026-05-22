@@ -1,0 +1,83 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.4.15/schema.json",
+	"vcs": {
+		"enabled": true,
+		"clientKind": "git",
+		"useIgnoreFile": true
+	},
+	"files": {
+		"ignoreUnknown": false,
+		"includes": [
+			"**/src/**/*",
+			"**/app/**/*",
+			"**/.vscode/**/*",
+			"!**/index.html",
+			"**/vite.config.ts",
+			"**/tsconfig.ts",
+			"**/*.json",
+			"!**/app/routeTree.gen.ts",
+			"!**/app/styles.css"
+		]
+	},
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab"
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true,
+			"nursery": {
+				"noUndeclaredEnvVars": "error",
+				"useAwaitThenable": "warn"
+			},
+			"style": {
+				"useImportType": "error",
+				"noProcessEnv": "error",
+				"noRestrictedImports": {
+					"level": "error",
+					"options": {
+						"paths": {
+							"zod": {
+								"message": "Use \"zod/v4\" instead",
+								"allowImportNames": ["zod/v4"]
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "double",
+			"semicolons": "always",
+			"trailingCommas": "all"
+		},
+		"linter": { "enabled": true }
+	},
+	"json": { "formatter": { "enabled": true }, "linter": { "enabled": true } },
+	"assist": {
+		"enabled": true,
+		"actions": {
+			"recommended": true,
+			"source": {
+				"useSortedInterfaceMembers": "on",
+				"organizeImports": "on",
+				"recommended": true
+			}
+		}
+	},
+	"overrides": [
+		{
+			"includes": ["packages/env/**/*.ts"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noProcessEnv": "off"
+					}
+				}
+			}
+		}
+	]
+}

@@ -1,57 +1,44 @@
 {
-  "$schema": "https://turborepo.com/schema.json",
-  "ui": "tui",
-  "tasks": {
-    "build": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".cache/tsbuildinfo.json", "dist/**"]
-    },
-    "//#clean": {
-      "cache": false
-    },
-    "dev": {
-      "cache": false,
-      "persistent": true
-    },
-    "exports": {
-      "cache": false
-    },
-    "lint": {
-      "dependsOn": ["^typegen"],
-      "outputs": [".cache/.eslintcache"]
-    },
-    "typegen": {
-      "dependsOn": ["^typegen"],
-      "outputs": [".cache/tsgeninfo.json", "dist/**"]
-    },
-    "format": {
-      "outputs": [".cache/.prettiercache"],
-      "outputLogs": "new-only"
-    },
-    "typecheck": {
-      "dependsOn": ["^typegen"],
-      "outputs": [".cache/tsbuildinfo.json"]
-    }
-  },
-  "globalEnv": ["NEXT_PUBLIC_API_URL"],
-  "globalPassThroughEnv": [
-    "NODE_ENV",
-    "CI",
-    "VERCEL",
-    "VERCEL_ENV",
-    "VERCEL_URL",
-    "npm_lifecycle_event",
-    "MONGODB_URI",
-    "CLOUDFLARE_TURNSTILE_SECRET_KEY",
-    "SERVER_TOKEN",
-    "BETTER_AUTH_SECRET",
-    "BETTER_AUTH_URL",
-    "S3_ACCESS_KEY_ID",
-    "S3_SECRET_ACCESS_KEY",
-    "S3_REGION",
-    "S3_BUCKET",
-    "ALGOLIA_APP_ID",
-    "ALGOLIA_API_KEY"
-  ]
+	"$schema": "https://turborepo.dev/schema.json",
+	"ui": "tui",
+	"tasks": {
+		"//#clean": {
+			"cache": false
+		},
+		"dev": {
+			"cache": false,
+			"persistent": true
+		},
+		"format": {
+			"outputs": [".cache/.biomefmtcache"],
+			"outputLogs": "new-only"
+		},
+		"lint": {
+			"dependsOn": ["^lint"],
+			"outputs": [".cache/.biomelintcache"]
+		},
+
+		"typecheck": {
+			"dependsOn": ["^typecheck"],
+			"outputs": [".cache/tsbuildinfo.json"]
+		}
+	},
+	"globalEnv": ["X3BUN_BE_URL"],
+	"globalPassThroughEnv": [
+		"NODE_ENV",
+		"DEV",
+		"MODE",
+		"CI",
+		"DATABASE_URL",
+		"BETTER_AUTH_URL",
+		"BETTER_AUTH_SECRET",
+		"AUTH_DB_URL",
+		"AUTH_TABLE_NAME",
+		"S3_ACCESS_KEY_ID",
+		"S3_SECRET_ACCESS_KEY",
+		"S3_REGION",
+		"S3_ENDPOINT",
+		"CF_TURNSTILE_SECRET_KEY",
+		"SERVER_TOKEN"
+	]
 }

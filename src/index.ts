@@ -1,34 +1,31 @@
 #!/usr/bin/env bun
+
 import { existsSync, renameSync } from "node:fs";
-import { mkdir, readdir, readFile, stat, writeFile, cp } from "node:fs/promises";
-import path, { join } from "node:path";
-import { fileURLToPath } from "node:url";
-import { spawnSync } from "node:child_process";
+import { cp } from "node:fs/promises";
+import path from "node:path";
+import { Glob } from "bun";
 
 type StarterConfig = {
-  templateScope: string; // e.g. "x3bun" (without "@")
+  templateScope: string;
   packages: Record<string, string>;
+  packageManager: string;
 };
 
 type CliFlags = {
   yes: boolean;
-  git?: boolean; // undefined = not specified, true = --git, false = --no-git
+  git?: boolean;
   help: boolean;
+  install: boolean;
 };
 
 /**
- * Run a command inside a working directory (cross-platform).
- * - Uses `shell: true` on Windows so `git` / `bun` resolve reliably.
+ * Asserts that the script is running in Bun environment.
  */
-function run(cmd: string, args: string[], cwd: string, silent: boolean = false) {
-  const result = spawnSync(cmd, args, {
-    cwd,
-    stdio: silent ? "ignore" : "inherit",
-    shell: process.platform === "win32", // important for Windows
-  });
-
-  if (result.status !== 0) {
-    throw new Error(`Command failed: ${cmd} ${args.join(" ")}`);
+function assertRunningOnBun() {
+  if (!Bun.version) {
+    console.error("❌ This starter must be run with Bun.");
+    console.error("Use: bun create x3bun-app <ProjectName> [options]");
+    process.exit(1);
   }
 }
 
@@ -38,21 +35,22 @@ function run(cmd: string, args: string[], cwd: string, silent: boolean = false) 
  * --git
  * --no-git
  * --help / -h
+ * --install / -i
+ * @returns Parsed flags
  */
 function parseFlags(): CliFlags {
-  const args = process.argv.slice(2);
+  const args = Bun.argv.slice(2);
 
-  const help = args.includes("--help") || args.includes("-h");
-  const yes = args.includes("--yes") || args.includes("-y");
-
-  const hasGit = args.includes("--git");
-  const hasNoGit = args.includes("--no-git");
-
-  let git: boolean | undefined = undefined;
-  if (hasGit) git = true;
-  if (hasNoGit) git = false; // override
-
-  return { yes, git, help };
+  return {
+    yes: args.includes("--yes") || args.includes("-y"),
+    help: args.includes("--help") || args.includes("-h"),
+    git: args.includes("--no-git")
+      ? false
+      : args.includes("--git")
+        ? true
+        : undefined,
+    install: args.includes("--install") || args.includes("-i"),
+  };
 }
 
 /** Print CLI help */
@@ -61,43 +59,25 @@ function printHelp() {
 create-x3bun-app
 
 Usage:
-  bunx create x3bun-app [projectName] [options]
+  bun create x3bun-app [projectName] [options]
   bunx create-x3bun-app [projectName] [options]
 
 Options:
-  --yes, -y       Skip prompts and use defaults (git init + bun install)
+  --yes, -y       Skip prompts and use defaults (same as --git --install)
+  --no-git        Skip git init (overrides --git)
   --git           Force git init
-  --no-git        Skip git init (wins over --git/--yes)
-  --help, -h      Show this help
-
-Examples:
-  bunx create x3bun-app myx3bun
-  bunx create x3bun-app myx3bun --yes
-  bunx create x3bun-app myx3bun --no-git
+  --help, -h      Show help
+  --install, -i   Install dependencies after setup
 `);
 }
 
-/**
- * Asserts that the script is running in Bun environment.
- */
-function assertRunningOnBun() {
-  const isBun = typeof (process as any).versions?.bun === "string";
-  const ua = process.env.npm_config_user_agent ?? "";
-  const invokedByBun = ua.includes("bun/");
-  if (!isBun && !invokedByBun) {
-    console.error("❌ This starter must be run with Bun.");
-    console.error("Use: bunx create x3bun-app");
-    process.exit(1);
-  }
-}
 
 /**
  * Retrieves the project name from command-line arguments.
  * @returns Project Name
  */
-function getArgProjectName(): string | undefined {
-  const args = process.argv.slice(2);
-  return args.find((a) => a && !a.startsWith("-"))?.trim() || undefined;
+function getArgProjectName() {
+  return Bun.argv.slice(2).find((a) => !a.startsWith("-"))?.trim();
 }
 
 /**
@@ -107,8 +87,10 @@ function getArgProjectName(): string | undefined {
  * @returns Project name
  */
 async function promptText(label: string, defaultValue?: string) {
-  const p = `${label}${defaultValue ? ` (${defaultValue})` : ""}: `;
-  const value = (prompt(p) ?? "").trim();
+  const value = prompt(
+    `${label}${defaultValue ? ` (${defaultValue})` : ""}: `
+  )?.trim();
+
   return value || defaultValue || "";
 }
 
@@ -117,47 +99,94 @@ async function promptText(label: string, defaultValue?: string) {
  */
 function normalizeProjectName(input: string) {
   const v = input.trim();
-  const ok = /^[a-z0-9][a-z0-9._-]*$/.test(v);
-  if (!ok) return "";
-  return v;
+
+  return /^[a-z0-9][a-z0-9._-]*$/.test(v) ? v : "";
 }
 
-/** Copy template to Project directory */
-async function copyTemplate(templateDir: string, destDir: string) {
+async function run(
+  cmd: string[],
+  cwd: string,
+  silent = false
+) {
+  const proc = Bun.spawn(cmd, {
+    cwd,
+    stdout: silent ? "ignore" : "inherit",
+    stderr: silent ? "ignore" : "inherit",
+    stdin: "inherit",
+  });
+
+  const exitCode = await proc.exited;
+
+  if (exitCode !== 0) {
+    throw new Error(`Command failed: ${cmd.join(" ")}`);
+  }
+}
+
+async function copyTemplate(
+  templateDir: string,
+  destDir: string
+) {
   await cp(templateDir, destDir, {
     recursive: true,
     force: false,
     errorOnExist: true,
   });
 
-  if (existsSync(join(destDir, "_gitignore"))) {
-    renameSync(join(destDir, "_gitignore"), join(destDir, ".gitignore"));
+  const gitignoreSrc = path.join(destDir, "_gitignore");
+  const gitignoreDest = path.join(destDir, ".gitignore");
+
+  if (existsSync(gitignoreSrc)) {
+    renameSync(gitignoreSrc, gitignoreDest);
   }
 }
 
-/** Modify the root `package.json` package `name` */
-async function setRootPackageName(rootDir: string, newRootName: string) {
-  const rootPkgPath = path.join(rootDir, "package.json");
-  const raw = await readFile(rootPkgPath, "utf8");
-  const json = JSON.parse(raw);
-  json.name = newRootName;
-  await writeFile(rootPkgPath, JSON.stringify(json, null, 2) + "\n", "utf8");
+async function copyReadMe(binDirectory: string, destDir: string) {
+  const readmeSrc = path.join(binDirectory, "../", "README.md");
+  const readmeDest = path.join(destDir, "README.md");
+  await cp(readmeSrc, readmeDest);
+
 }
 
+async function setRootPackageName(
+  rootDir: string,
+  newRootName: string
+) {
+  const pkgPath = path.join(rootDir, "package.json");
+
+  const json = await Bun.file(pkgPath).json();
+
+  json.name = newRootName;
+
+  await Bun.write(
+    pkgPath,
+    JSON.stringify(json, null, 2) + "\n"
+  );
+}
+
+/**
+ * Rewrites project internal dependencies to the new scope
+ * @param section dependencies/devDependencies/peerDependencies/optionalDependencies section of package.json
+ * @param fromScope original scope ex `@x3bun/*`
+ * @param toScope new scope ex `@myx3bun/*`
+ * @returns rewritten section with updated keys (if needed)
+ */
 function rewriteDepsSectionKeys(
   section: Record<string, string> | undefined,
-  fromScopeWithSlash: string,
-  toScopeWithSlash: string
+  fromScope: string,
+  toScope: string
 ) {
   if (!section) return section;
 
   const out: Record<string, string> = {};
-  for (const [pkg, ver] of Object.entries(section)) {
-    const newKey = pkg.startsWith(fromScopeWithSlash)
-      ? pkg.replace(fromScopeWithSlash, toScopeWithSlash)
-      : pkg;
-    out[newKey] = ver;
+
+  for (const [pkg, version] of Object.entries(section)) {
+    out[
+      pkg.startsWith(fromScope)
+        ? pkg.replace(fromScope, toScope)
+        : pkg
+    ] = version;
   }
+
   return out;
 }
 
@@ -167,28 +196,28 @@ function rewriteDepsSectionKeys(
  * @returns Files paths
  */
 async function findAllFiles(rootDir: string) {
-  const results: string[] = [];
+  const files: string[] = [];
 
-  async function walk(dir: string) {
-    const entries = await readdir(dir, { withFileTypes: true });
+  const glob = new Glob("**/*");
 
-    for (const e of entries) {
-      if (e.isDirectory()) {
-        if (
-          e.name === "node_modules" ||
-          e.name === ".git" ||
-          e.name === ".turbo"
-        )
-          continue;
-        await walk(path.join(dir, e.name));
-        continue;
-      }
-      results.push(path.join(dir, e.name));
+  for await (const file of glob.scan({
+    cwd: rootDir,
+    absolute: true,
+    onlyFiles: true,
+    dot: true,
+  })) {
+    if (
+      file.includes("/node_modules/") ||
+      file.includes("/.git/") ||
+      file.includes("/.turbo/")
+    ) {
+      continue;
     }
+
+    files.push(file);
   }
 
-  await walk(rootDir);
-  return results;
+  return files;
 }
 
 /**
@@ -197,8 +226,19 @@ async function findAllFiles(rootDir: string) {
  * @returns all paths to package.json files
  */
 async function findAllPackageJsonFiles(rootDir: string) {
-  const all = await findAllFiles(rootDir);
-  return all.filter((p) => path.basename(p) === "package.json");
+  const rootPackageJson = path.resolve(
+    rootDir,
+    "package.json"
+  );
+
+  const files = await findAllFiles(rootDir);
+
+  return files.filter((file) => {
+    return (
+      path.basename(file) === "package.json"
+      //&& path.resolve(file) !== rootPackageJson
+    );
+  });
 }
 
 /**
@@ -208,68 +248,82 @@ async function findAllPackageJsonFiles(rootDir: string) {
  * @param projectName Project Name
  * @param templateScope original scope ex `x3bun
  */
-async function applyRepoScope(
+async function applyRepoScope({ templateScope, projectName, rootDir, packageManager }: {
   rootDir: string,
   projectName: string,
-  templateScope: string
+  templateScope: string,
+  packageManager: string
+}
 ) {
-  const fromScopeWithSlash = `@${templateScope}/`;
-  const toScopeWithSlash = `@${projectName}/`;
+  const fromScope = `@${templateScope}/`;
+  const toScope = `@${projectName}/`;
 
-  const packageJsonFiles = await findAllPackageJsonFiles(rootDir);
+  const packageJsonFiles =
+    await findAllPackageJsonFiles(rootDir);
 
   // 1) Update all workspace package.json files (except root handled separately)
   for (const filePath of packageJsonFiles) {
-    if (
-      path.resolve(filePath) === path.resolve(path.join(rootDir, "package.json"))
-    )
-      continue;
+    // if (
+    //   path.resolve(filePath) ===
+    //   path.resolve(path.join(rootDir, "package.json"))
+    // ) {
+    //   continue;
+    // }
 
-    const raw = await readFile(filePath, "utf8");
-    const json = JSON.parse(raw);
+    const json = await Bun.file(filePath).json();
 
-    // package name
     if (
       typeof json.name === "string" &&
-      json.name.startsWith(fromScopeWithSlash)
+      json.name.startsWith(fromScope)
     ) {
-      json.name = json.name.replace(fromScopeWithSlash, toScopeWithSlash);
+      json.name = json.name.replace(
+        fromScope,
+        toScope
+      );
     }
 
-    // deps keys
+    json.packageManager = packageManager;
     json.dependencies = rewriteDepsSectionKeys(
       json.dependencies,
-      fromScopeWithSlash,
-      toScopeWithSlash
+      fromScope,
+      toScope
     );
+
     json.devDependencies = rewriteDepsSectionKeys(
       json.devDependencies,
-      fromScopeWithSlash,
-      toScopeWithSlash
+      fromScope,
+      toScope
     );
+
     json.peerDependencies = rewriteDepsSectionKeys(
       json.peerDependencies,
-      fromScopeWithSlash,
-      toScopeWithSlash
+      fromScope,
+      toScope
     );
-    json.optionalDependencies = rewriteDepsSectionKeys(
-      json.optionalDependencies,
-      fromScopeWithSlash,
-      toScopeWithSlash
-    );
+
+    json.optionalDependencies =
+      rewriteDepsSectionKeys(
+        json.optionalDependencies,
+        fromScope,
+        toScope
+      );
 
     // also fix string fields inside package.json that reference old scope (e.g. "prettier": "@x3bun/prettier/next")
     const serialized = JSON.stringify(json);
-    const fixed = serialized.includes(fromScopeWithSlash)
-      ? JSON.parse(serialized.split(fromScopeWithSlash).join(toScopeWithSlash))
+
+    const fixed = serialized.includes(fromScope)
+      ? JSON.parse(
+        serialized.split(fromScope).join(toScope)
+      )
       : json;
 
-    await writeFile(filePath, JSON.stringify(fixed, null, 2) + "\n", "utf8");
+    await Bun.write(
+      filePath,
+      JSON.stringify(fixed, null, 2) + "\n"
+    );
   }
 
-  // 2) Replace in text files (imports/configs/docs)
-  const allFiles = await findAllFiles(rootDir);
-  const textFileExts = new Set([
+  const textExtensions = new Set([
     ".json",
     ".js",
     ".cjs",
@@ -283,43 +337,65 @@ async function applyRepoScope(
     ".md",
   ]);
 
+  // 2) Replace in text files (imports/configs/docs)
+  const allFiles = await findAllFiles(rootDir);
+
   for (const filePath of allFiles) {
-    const ext = path.extname(filePath);
-    if (!textFileExts.has(ext)) continue;
+    if (!textExtensions.has(path.extname(filePath))) {
+      continue;
+    }
 
-    const s = await stat(filePath);
-    if (s.size > 2_000_000) continue;
+    const file = Bun.file(filePath);
 
-    const raw = await readFile(filePath, "utf8");
-    if (!raw.includes(fromScopeWithSlash)) continue;
+    if (file.size > 2_000_000) {
+      continue;
+    }
 
-    const replaced = raw.split(fromScopeWithSlash).join(toScopeWithSlash);
-    await writeFile(filePath, replaced, "utf8");
+    const raw = await file.text();
+
+    if (!raw.includes(fromScope)) {
+      continue;
+    }
+
+    await Bun.write(
+      filePath,
+      raw.split(fromScope).join(toScope)
+    );
   }
 }
 
 function rewriteDepsSectionVersions(
   section: Record<string, string> | undefined,
   config: StarterConfig,
-  filePath: string
 ) {
   if (!section) return;
 
-  for (const [pkg, ver] of Object.entries(section)) {
-    if (ver === "config") {
-      const resolved = config.packages[pkg];
-      if (!resolved) {
-        throw new Error(
-          `Missing version mapping for "${pkg}" in config (file: ${filePath})`
-        );
-      }
-      section[pkg] = resolved;
+  for (const [pkg, version] of Object.entries(config.packages)) {
+    if (section[pkg]) {
+      section[pkg] = version
     }
   }
+
+  // for (const [pkg, version] of Object.entries(section)) {
+  //   if (version !== "config") continue;
+
+  //   const resolved = config.packages[pkg];
+
+  //   if (!resolved) {
+  //     throw new Error(
+  //       `Missing version mapping for "${pkg}" in config (${filePath})`
+  //     );
+  //   }
+
+  //   section[pkg] = resolved;
+  // }
 }
 
-function sortObjectKeys<T extends Record<string, any> | undefined>(obj: T): T {
+function sortObjectKeys<
+  T extends Record<string, any> | undefined
+>(obj: T): T {
   if (!obj) return obj;
+
   return Object.keys(obj)
     .sort((a, b) => a.localeCompare(b))
     .reduce((acc, key) => {
@@ -333,28 +409,66 @@ function sortObjectKeys<T extends Record<string, any> | undefined>(obj: T): T {
  * @param rootDir Project root directort
  * @param config config file
  */
-async function applyVersions(rootDir: string, config: StarterConfig) {
-  const packageJsonFiles = await findAllPackageJsonFiles(rootDir);
+async function applyVersions(
+  rootDir: string,
+  config: StarterConfig
+) {
+  const packageJsonFiles =
+    await findAllPackageJsonFiles(rootDir);
 
   for (const filePath of packageJsonFiles) {
-    const raw = await readFile(filePath, "utf8");
-    const json = JSON.parse(raw);
+    const json = await Bun.file(filePath).json();
 
-    rewriteDepsSectionVersions(json.dependencies, config, filePath);
-    rewriteDepsSectionVersions(json.devDependencies, config, filePath);
-    rewriteDepsSectionVersions(json.peerDependencies, config, filePath);
-    rewriteDepsSectionVersions(json.optionalDependencies, config, filePath);
+    rewriteDepsSectionVersions(
+      json.dependencies,
+      config,
+    );
+
+    rewriteDepsSectionVersions(
+      json.devDependencies,
+      config,
+    );
+
+    rewriteDepsSectionVersions(
+      json.peerDependencies,
+      config,
+    );
+
+    rewriteDepsSectionVersions(
+      json.optionalDependencies,
+      config,
+    );
 
     // OPTIONAL: allow using "config" in root resolutions too
-    rewriteDepsSectionVersions(json.resolutions, config, filePath);
+    rewriteDepsSectionVersions(
+      json.resolutions,
+      config,
+    );
 
-    json.dependencies = sortObjectKeys(json.dependencies);
-    json.devDependencies = sortObjectKeys(json.devDependencies);
-    json.peerDependencies = sortObjectKeys(json.peerDependencies);
-    json.optionalDependencies = sortObjectKeys(json.optionalDependencies);
-    json.resolutions = sortObjectKeys(json.resolutions);
+    json.dependencies = sortObjectKeys(
+      json.dependencies
+    );
 
-    await writeFile(filePath, JSON.stringify(json, null, 2) + "\n", "utf8");
+    json.devDependencies = sortObjectKeys(
+      json.devDependencies
+    );
+
+    json.peerDependencies = sortObjectKeys(
+      json.peerDependencies
+    );
+
+    json.optionalDependencies = sortObjectKeys(
+      json.optionalDependencies
+    );
+
+    json.resolutions = sortObjectKeys(
+      json.resolutions
+    );
+
+    await Bun.write(
+      filePath,
+      JSON.stringify(json, null, 2) + "\n"
+    );
   }
 }
 
@@ -365,10 +479,12 @@ async function applyVersions(rootDir: string, config: StarterConfig) {
  * --------------------------------------------------
  */
 async function main() {
+  // Fail fast if not running in Bun
   assertRunningOnBun();
 
-  // CLI flags
+  // CLI flags parsing
   const flags = parseFlags();
+
   if (flags.help) {
     printHelp();
     process.exit(0);
@@ -376,140 +492,234 @@ async function main() {
 
   const argProjectName = getArgProjectName();
 
-  // Prompt for project name if not provided as argument
-  // If --yes is provided and no arg name, use default "myx3bun"
   if (flags.yes && !argProjectName) {
     console.log(
-      "⚠️  --yes provided without project name, using default: myx3bun"
+      "⚠️ --yes provided without project name, using default: myx3bun"
     );
   }
+
   const projectNameRaw =
     argProjectName ??
     (flags.yes
       ? "myx3bun"
-      : await promptText("Project name (root package name)", "myx3bun"));
+      : await promptText(
+        "Project name",
+        "myx3bun"
+      ));
 
-  const projectName = normalizeProjectName(projectNameRaw);
+  const projectName =
+    normalizeProjectName(projectNameRaw);
 
   if (!projectName) {
     console.error(
-      "❌ Invalid project name. Use lowercase letters/numbers and - _ . only."
+      "❌ Invalid project name. Use lowercase letters, numbers, -, _, ."
     );
+
     process.exit(1);
   }
 
-  /** Project directory */
-  const destDir = path.resolve(process.cwd(), projectName);
+  /** New Project directory */
+  const destDir = path.resolve(
+    process.cwd(),
+    projectName
+  );
 
   // Check if folder exists
   if (existsSync(destDir)) {
-    // Folder exists
-    console.error(`❌ Folder already exists: ${destDir}`);
+    console.error(
+      `❌ Folder already exists: ${destDir}`
+    );
 
-    // Exit with error
     process.exit(1);
   }
 
-  // Create project folder
-  await mkdir(destDir, { recursive: true });
-
   /** Current script directory */
-  const here = path.dirname(fileURLToPath(import.meta.url));
+  const binDirectory = import.meta.dir;
 
-  /** Template directory */
-  const templateDir = path.resolve(here, "../templates/default");
+  const templateDir = path.resolve(
+    binDirectory,
+    "../templates/default"
+  );
 
   /** Config File path */
-  const configPath = path.resolve(here, "../config.json");
+  const configPath = path.resolve(
+    binDirectory,
+    "../config.json"
+  );
 
   // Load config
-  const configRaw = await readFile(configPath, "utf8");
+  const config =
+    (await Bun.file(configPath).json()) as StarterConfig;
 
-  /** Config Object */
-  const config: StarterConfig = JSON.parse(configRaw);
-
-  if (!config.templateScope || /[^a-z0-9._-]/.test(config.templateScope)) {
+  if (
+    !config.templateScope ||
+    /[^a-z0-9._-]/.test(config.templateScope)
+  ) {
     console.error(
-      '❌ Invalid templateScope in config.json. Use something like: "x3bun"'
+      "❌ Invalid templateScope in config.json"
     );
+
     process.exit(1);
   }
 
   await copyTemplate(templateDir, destDir);
 
+  await copyReadMe(binDirectory, destDir);
+
   // Root name: "myx3bun"
   await setRootPackageName(destDir, projectName);
 
   // Workspace scope: "@myx3bun/*" based on templateScope: "@x3bun/*"
-  await applyRepoScope(destDir, projectName, config.templateScope);
+  await applyRepoScope({
+    rootDir: destDir,
+    projectName,
+    templateScope: config.templateScope,
+    packageManager: config.packageManager,
+  });
 
   // Replace "config" versions in all package.json files (and resolutions if you use it)
   await applyVersions(destDir, config);
 
   // Decide if bun install should run (priority: --yes > prompt)
   let shouldInstall: boolean;
-  if (flags.yes) {
+
+  if (flags.install || flags.yes) {
     shouldInstall = true;
   } else {
-    const installAnswer = (
-      await promptText("Install dependencies now? (Y/n)", "Y")
+    const answer = (
+      await promptText(
+        "Install dependencies now? (Y/n)",
+        "Y"
+      )
     ).toLowerCase();
 
     shouldInstall =
-      installAnswer === "y" || installAnswer === "yes" || installAnswer === "";
+      answer === "" ||
+      answer === "y" ||
+      answer === "yes";
   }
 
   if (shouldInstall) {
     try {
-      run("bun", ["install"], destDir);
-      console.log("✅ Dependencies installed");
+      await run(["bun", "install"], destDir);
+
+      console.log(
+        "✅ Dependencies installed"
+      );
+    } catch {
+      console.warn(
+        "⚠️ Dependency installation failed"
+      );
+    }
+    try {
+      await run(["bun", "lint:fix"], destDir);
+      console.log(
+        "✅ Initial Linting Completed"
+      );
     } catch (err) {
       console.warn(
-        "⚠️  Dependency installation failed. You can run `bun install` manually."
+        "⚠️ Auto lint fix failed:",
+        (err as Error).message
+      );
+      console.warn(
+        "Please run `bun run lint:fix` manually after installation"
       );
     }
   }
+
 
   // Decide if git should initialize (priority: --no-git > --git > --yes > prompt)
   let shouldInitGit: boolean;
 
   if (flags.git === false) {
     shouldInitGit = false;
-  } else if (flags.git === true) {
-    shouldInitGit = true;
-  } else if (flags.yes) {
+  } else if (flags.git === true || flags.yes) {
     shouldInitGit = true;
   } else {
-    const gitAnswer = (
-      await promptText("Initialize git repository? (Y/n)", "Y")
+    const answer = (
+      await promptText(
+        "Initialize git repository? (Y/n)",
+        "Y"
+      )
     ).toLowerCase();
 
-    shouldInitGit = gitAnswer === "y" || gitAnswer === "yes" || gitAnswer === "";
+    shouldInitGit =
+      answer === "" ||
+      answer === "y" ||
+      answer === "yes";
   }
 
   if (shouldInitGit) {
     try {
-      run("git", ["init", "-q"], destDir, true);
+      await run(
+        ["git", "init", "-q"],
+        destDir,
+        true
+      );
 
-      // Optional initial commit (comment out if you don’t want it)
-      run("git", ["add", "."], destDir, true);
-      run("git", ["commit", "-m", "Initial commit", "--quiet"], destDir, true);
-      console.log("✅ Git repository initialized");
+      await run(
+        ["git", "add", "."],
+        destDir,
+        true
+      );
+
+      await run(
+        [
+          "git",
+          "commit",
+          "-m",
+          "Initial commit",
+          "--quiet",
+        ],
+        destDir,
+        true
+      );
+
+      console.log(
+        "✅ Git repository initialized"
+      );
     } catch (err) {
-      console.warn("⚠️  Git initialization failed:", (err as Error).message);
+      console.warn(
+        "⚠️ Git initialization failed:",
+        (err as Error).message
+      );
     }
   }
 
   console.log(`✅ Created ${projectName}`);
   console.log(`✅ Root package name: ${projectName}`);
   console.log(`✅ Workspace scope: @${projectName}/*`);
-  console.log(`Next:`);
+  if (shouldInstall) {
+    try {
+      await run(["bun", "postinstall"], destDir);
+
+    } catch (err) {
+      console.warn(
+        "⚠️ Post-installation Script failed:",
+        (err as Error).message
+      );
+      console.warn(
+        "Please run `bun run postinstall` manually after installation"
+      );
+    }
+  }
+
+
+  console.log("\nNext:");
   console.log(`  cd ${projectName}`);
-  if (!shouldInstall) console.log(`  bun install`);
+
+  if (!shouldInstall) {
+    console.log(`  bun install`);
+  }
+
   console.log(`  bun run dev`);
 }
 
 main().catch((err) => {
-  console.error("❌ Failed:", err?.message ?? err);
+  console.error(
+    "❌ Failed:",
+    err?.message ?? err
+  );
+
   process.exit(1);
 });

@@ -1,9 +1,18 @@
 {
-  "eslint.workingDirectories": [
-    {
-      "mode": "auto"
-    }
-  ],
-  "prettier.prettierPath": "node_modules/prettier",
-  "npm.packageManager": "bun"
+	"js/ts.tsdk.path": "node_modules/typescript/lib",
+	"editor.defaultFormatter": "biomejs.biome",
+	"npm.packageManager": "bun",
+	"editor.formatOnSave": true,
+	"files.watcherExclude": {
+		"**/routeTree.gen.ts": true
+	},
+	"search.exclude": {
+		"**/routeTree.gen.ts": true
+	},
+	"files.readonlyInclude": {
+		"**/routeTree.gen.ts": true
+	},
+	"editor.codeActionsOnSave": {
+		"source.organizeImports.biome": "always"
+	}
 }

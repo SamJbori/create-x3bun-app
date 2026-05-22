@@ -1,5 +1,4 @@
 {
-  "extends": "@x3bun/typescript/compile.json",
-  "include": ["src"],
-  "exclude": ["node_modules"]
+	"extends": "@x3bun/typescript/server",
+	"include": ["src"]
 }

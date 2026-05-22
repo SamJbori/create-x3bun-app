@@ -1,29 +1,25 @@
 {
-  "name": "@x3bun/server",
-  "type": "module",
-  "scripts": {
-    "dev": "bun run --hot --env-file=../../.env --port=3006 src/index.ts ",
-    "format": "prettier --check . --ignore-path ../../.gitignore",
-    "lint": "eslint --flag unstable_native_nodejs_ts_config",
-    "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {
-    "@hono/trpc-server": "config",
-    "@t3-oss/env-core": "config",
-    "@x3bun/api": "workspace:*",
-    "bun": "config",
-    "hono": "config",
-    "mongodb": "config",
-    "zod": "config"
-  },
-  "devDependencies": {
-    "@ianvs/prettier-plugin-sort-imports": "config",
-    "@types/bun": "config",
-    "@types/node": "config",
-    "@x3bun/eslint": "workspace:*",
-    "@x3bun/prettier": "workspace:*",
-    "@x3bun/typescript": "workspace:*",
-    "typescript": "config"
-  },
-  "prettier": "@x3bun/prettier/base"
+	"name": "@x3bun/server",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"dev": "bun run --bun --hot --env-file=../../.env --port=3006 src/_index.ts ",
+		"format": "biome format .",
+		"format:fix": "biome format . --write",
+		"lint": "biome check .",
+		"lint:fix": "biome check . --write",
+		"typecheck": "tsc --noEmit"
+	},
+	"devDependencies": {
+		"@types/bun": "latest",
+		"@x3bun/auth": "workspace:*",
+		"@x3bun/typescript": "workspace:*"
+	},
+	"dependencies": {
+		"@hono/trpc-server": "0.4.2",
+		"@x3bun/api": "workspace:*",
+		"@x3bun/env": "workspace:*",
+		"hono": "4.12.21",
+		"zod": "^4.4.3"
+	}
 }

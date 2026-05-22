@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { execSync } from "node:child_process";
+import { execSync } from "child_process";
 import {
   chmodSync,
   copyFileSync,
@@ -52,9 +52,9 @@ async function main() {
     copyFileSync(SOURCE_HOOK, HOOK_PATH);
   }
 
-  ensureExecutable(HOOK_PATH);
+  const execCode = ensureExecutable(HOOK_PATH);
 
-  console.log("✅ Hook setup complete. It will run automatically on git push.");
+  console.log(execCode === 3 ? "⚠️  Hook setup incomplete." : "✅ Hook setup complete. It will run automatically on git push.");
 }
 
 function askYesNo(question) {
@@ -77,11 +77,14 @@ function ensureExecutable(path) {
     if (!isExecutable) {
       chmodSync(path, stats.mode | 0o755);
       console.log("🔐 Added +x permission to hook.");
+      return 1
     } else {
       console.log("🔓 Hook already executable.");
+      return 2
     }
   } catch (err) {
     console.warn(`⚠️ Could not verify executable permission: ${err.message}`);
+    return 3
   }
 }
 
