@@ -9,7 +9,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/SamJbori/create-x3bun-app.git"
+    "url": "git+https://github.com/SamJbori/create-x3bun-app.git"
   },
   "homepage": "https://github.com/SamJbori/create-x3bun-app#readme",
   "keywords": [
@@ -45,7 +45,7 @@
   ],
   "type": "module",
   "bin": {
-    "create-x3bun-app": "./src/index.ts"
+    "create-x3bun-app": "src/index.ts"
   },
   "files": [
     "src",
