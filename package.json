@@ -31,7 +31,17 @@
     "fullstack",
     "typescript",
     "starter",
-    "template"
+    "template",
+    "cli",
+    "scaffolding",
+    "boilerplate",
+    "tailwindcss",
+    "react-query",
+    "tanstack-router",
+    "tanstack-react-query",
+    "tanstack",
+    "hone",
+    "vite"
   ],
   "type": "module",
   "bin": {
