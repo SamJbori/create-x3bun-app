@@ -1,6 +1,6 @@
 import "server-only";
-import { createTRPCProxyClient, httpBatchLink } from "@trpc/react-query";
 import type { AppRouter } from "@x3bun/api";
+import { createTRPCProxyClient, httpBatchLink } from "@trpc/react-query";
 import SuperJSON from "superjson";
 import { env } from "./env";
 

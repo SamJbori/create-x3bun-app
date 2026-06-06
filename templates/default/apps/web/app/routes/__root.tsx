@@ -2,8 +2,8 @@ import { TanStackDevtools } from "@tanstack/react-devtools";
 import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import "../styles.css";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import type { Context } from "../router";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 const createContextRootRoute = createRootRouteWithContext<Context>();
 

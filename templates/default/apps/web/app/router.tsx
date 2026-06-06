@@ -1,6 +1,5 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { createRouter as createTanStackRouter } from "@tanstack/react-router";
-
 import { getQueryClient } from "../src/lib/query";
 import { api, getTRPCClient, trpc } from "../src/lib/trpc";
 import { routeTree } from "./routeTree.gen";

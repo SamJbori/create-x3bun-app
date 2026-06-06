@@ -1,7 +1,6 @@
 import { RouterProvider } from "@tanstack/react-router";
 import React from "react";
 import ReactDOM from "react-dom/client";
-
 import { getRouter } from "./router";
 
 // biome-ignore lint/style/noNonNullAssertion: <It's OK>

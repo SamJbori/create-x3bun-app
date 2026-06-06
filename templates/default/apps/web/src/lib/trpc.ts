@@ -1,11 +1,11 @@
+import type { CreateTRPCClientOptions } from "@trpc/react-query";
+import type { AppRouter } from "@x3bun/api";
 import {
-	type CreateTRPCClientOptions,
 	createTRPCClient,
 	createTRPCReact,
 	httpBatchStreamLink,
 	loggerLink,
 } from "@trpc/react-query";
-import type { AppRouter } from "@x3bun/api";
 import SuperJSON from "superjson";
 import { env } from "./env";
 
