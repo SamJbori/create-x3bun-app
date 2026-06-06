@@ -19,7 +19,7 @@
 		"@hono/trpc-server": "0.4.2",
 		"@x3bun/api": "workspace:*",
 		"@x3bun/env": "workspace:*",
-		"hono": "4.12.21",
+		"hono": "4.12.23",
 		"zod": "^4.4.3"
 	}
 }

@@ -18,7 +18,7 @@
 		"@x3bun/typescript": "workspace:*"
 	},
 	"dependencies": {
-		"@trpc/server": "^11.17.0",
+		"@trpc/server": "latest",
 		"@x3bun/env": "workspace:*",
 		"superjson": "^2.2.6",
 		"zod": "^4.4.3"
