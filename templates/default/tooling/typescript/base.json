@@ -25,7 +25,6 @@
 		"noEmit": true,
 		"noImplicitAny": true,
 
-		"noUnusedParameters": true,
 		"noFallthroughCasesInSwitch": true,
 		"noUncheckedSideEffectImports": true,
 		"allowImportingTsExtensions": true

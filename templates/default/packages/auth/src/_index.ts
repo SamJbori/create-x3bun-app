@@ -1,25 +1,21 @@
-import { getEnvAuth } from "@x3bun/env";
 import type { BetterAuthOptions } from "better-auth";
+import { getEnvAuth } from "@x3bun/env";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { betterAuth } from "better-auth/minimal";
 import { anonymous, captcha, openAPI, phoneNumber } from "better-auth/plugins";
-import z from "zod/v4";
 import { getDBPromise } from "./db";
 
 const env = getEnvAuth();
 
 export const initAuth = async (config: {
 	cfTurnstileKey: string;
-	otpSend?: (config: {
+	otpSend: (config: {
 		phoneNumber: string;
 		code: string;
 	}) => Promise<undefined>;
-	domain?: string;
-	roles: string[];
+	domain: string;
 }) => {
 	const db = await getDBPromise();
-
-	const ROLE = z.enum(config.roles);
 
 	const authConfig = {
 		database: mongodbAdapter(db),
@@ -29,7 +25,7 @@ export const initAuth = async (config: {
 			useSecureCookies: true,
 			crossSubDomainCookies: {
 				enabled: true,
-				domain: config.domain as unknown as string, // Domain with a leading period
+				domain: `.${config.domain}`, // Domain with a leading period
 			},
 			defaultCookieAttributes: {
 				secure: true,
@@ -61,13 +57,6 @@ export const initAuth = async (config: {
 				isAnonymous: { type: "boolean", required: false },
 				// Use your own logic
 				isAdmin: { type: "boolean", required: false },
-				role: {
-					type: "string",
-					required: false,
-					// Add youe own validator
-					validator: { input: ROLE, output: ROLE },
-				},
-				isDevice: { type: "boolean", required: true, defaultValue: false },
 			},
 		},
 		plugins: [
@@ -79,13 +68,12 @@ export const initAuth = async (config: {
 				},
 			}),
 			phoneNumber({
-				sendOTP: ({ phoneNumber, code }) => {
-					config.otpSend?.({ phoneNumber, code });
+				sendOTP: async ({ phoneNumber, code }) => {
+					await config.otpSend({ phoneNumber, code });
 				},
 				expiresIn: 600,
 				otpLength: 6,
 				phoneNumberValidator: (_phoneNumber) => {
-					// return ZPhoneNumber.safeParse(phoneNumber).success;
 					return true;
 				},
 				signUpOnVerification: {

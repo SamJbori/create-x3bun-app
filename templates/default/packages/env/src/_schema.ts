@@ -24,4 +24,10 @@ export const envSchema = z.object({
 
 	/** Turnstile because you should */
 	CF_TURNSTILE_SECRET_KEY: z.string(),
+
+	/** Used for proxy request */
+	PROXY_SECRET: z.string(),
+
+	/** Domain Name, necessary for Cross Site Cookies */
+	DOMAIN_NAME: z.string(),
 });

@@ -1,6 +1,6 @@
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
+import type { Auth, AuthData } from "@x3bun/auth";
 import { initTRPC, TRPCError } from "@trpc/server";
-import type { AuthData } from "@x3bun/auth";
 import { getEnvServer } from "@x3bun/env";
 import superjson from "superjson";
 import z, { ZodError } from "zod/v4";
@@ -11,11 +11,14 @@ const env = getEnvServer();
 export const createTRPCContext = ({
 	headers,
 	authData,
+	auth,
 }: {
 	headers: Headers;
 	authData: AuthData;
+	auth: Auth;
 }) => {
 	return {
+		auth,
 		user: authData?.user,
 		headers,
 	};
@@ -104,7 +107,7 @@ const adminProcedure = publicProcedure.use(({ ctx, next }) => {
 });
 
 /**
- * Coming from server
+ * SSR Authentication
  */
 const serverProcedure = publicProcedure.use(async ({ ctx, next }) => {
 	const headerToken = ctx.headers.get("X-Server-Token");

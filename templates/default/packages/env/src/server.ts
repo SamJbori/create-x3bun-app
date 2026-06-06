@@ -4,6 +4,8 @@ const envServerSchema = envSchema.pick({
 	BETTER_AUTH_SECRET: true,
 	SERVER_TOKEN: true,
 	CF_TURNSTILE_SECRET_KEY: true,
+	PROXY_SECRET: true,
+	DOMAIN_NAME: true,
 });
 
 const envServerParse = () => ({

@@ -1,5 +1,6 @@
+import type { Db } from "mongodb";
 import { getEnvAuth } from "@x3bun/env";
-import { type Db, MongoClient } from "mongodb";
+import { MongoClient } from "mongodb";
 
 const env = getEnvAuth();
 

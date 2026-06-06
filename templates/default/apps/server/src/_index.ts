@@ -10,7 +10,10 @@ const env = getEnvServer();
 
 const auth = await initAuth({
 	cfTurnstileKey: env.CF_TURNSTILE_SECRET_KEY,
-	roles: ["ADMIN", "USER"],
+	otpSend: async (data) => {
+		console.log(data);
+	},
+	domain: env.DOMAIN_NAME,
 });
 
 const trpc = trpcServer({
@@ -20,6 +23,7 @@ const trpc = trpcServer({
 		return createTRPCContext({
 			headers,
 			authData: await auth.api.getSession({ headers }),
+			auth,
 		});
 	},
 	onError: ({ path, error }) => {
@@ -41,7 +45,6 @@ app.use(
 			"x-trpc-source",
 			"trpc-accept",
 			"x-captcha-response",
-			"x-hamem-cache",
 		],
 		allowMethods: ["POST", "GET", "OPTIONS"],
 		exposeHeaders: ["Content-Length", "X-Kuma-Revision"],
@@ -50,8 +53,41 @@ app.use(
 	}),
 );
 
+app.use("*", async (c, next) => {
+	const secret = c.req.header("X-Proxy-Secret");
+
+	if (secret !== env.PROXY_SECRET) {
+		return c.json({ error: "Unauthorized proxy" }, 401);
+	}
+
+	await next();
+});
+
 app.use("/v0.1/*", trpc);
 
 app.on(["POST", "GET"], "/auth/*", (c) => auth.handler(c.req.raw));
 
-export default app;
+// catch-all LAST
+app.all("*", (c) => {
+	return c.json(
+		{
+			error: "Unimplemented",
+			path: c.req.path,
+			method: c.req.method,
+		},
+		501,
+	);
+});
+
+if (env.isDev) {
+	console.log("Running Server in DEV mode...");
+	Bun.serve({
+		fetch: app.fetch,
+		// tls: {
+		// 	key: Bun.file("./certificates/localhost-key.pem"),
+		// 	cert: Bun.file("./certificates/localhost.pem"),
+		// },
+	});
+}
+
+export default env.isDev ? null : app;
