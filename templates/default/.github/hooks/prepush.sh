@@ -6,8 +6,8 @@ echo "🔍 Running base pre-push checks..."
 # Always-run commands
 bun install
 bun turbo typecheck
-bun turbo format
-bun turbo lint
+bun run format
+bun run lint
 bun run lint:ws
 
 echo "✅ Base checks passed."
