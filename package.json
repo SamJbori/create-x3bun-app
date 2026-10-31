@@ -52,7 +52,9 @@
     "src",
     "templates",
     "config.json",
-    "biome.json"
+    "biome.json",
+    "README.md",
+    "tsconfig.json"
   ],
   "devDependencies": {
     "@types/bun": "latest"
