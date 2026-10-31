@@ -1,8 +1,7 @@
 import { getEnvAuth } from "@x3bun/env";
-import type { BetterAuthOptions } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { betterAuth } from "better-auth/minimal";
-import { anonymous, captcha, openAPI, phoneNumber } from "better-auth/plugins";
+import { anonymous, openAPI, phoneNumber } from "better-auth/plugins";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
 import { getDBPromise } from "./db";
 
@@ -11,17 +10,14 @@ export { getAuthPromise } from "./auth";
 const env = getEnvAuth();
 
 export const initAuth = async (config: {
-  cfTurnstileKey: string | undefined;
   otpSend: (config: {
     phoneNumber: string;
     code: string;
   }) => Promise<undefined>;
   domain: string | undefined;
-}) => {
-  const db = await getDBPromise();
-
-  const authConfig = {
-    database: mongodbAdapter(db),
+}) =>
+  betterAuth({
+    database: mongodbAdapter(await getDBPromise()),
     basePath: "/api/auth",
     advanced: config.domain
       ? {
@@ -91,25 +87,16 @@ export const initAuth = async (config: {
           },
         },
       }),
-      config.cfTurnstileKey
-        ? captcha({
-            provider: "cloudflare-turnstile", // or google-recaptcha, hcaptcha
-            secretKey: config.cfTurnstileKey,
-            endpoints: env.isDev ? undefined : ["/phone-number/send-otp"],
-          })
-        : undefined,
       openAPI({ disableDefaultReference: env.isDev }),
       tanstackStartCookies(),
-    ] as BetterAuthOptions["plugins"],
+    ],
     onAPIError: {
       onError(error, ctx) {
         console.error("BETTER AUTH API ERROR", error, ctx);
       },
     },
-  } satisfies BetterAuthOptions;
+  });
 
-  return betterAuth({ ...authConfig });
-};
 export type Auth = Awaited<ReturnType<typeof initAuth>>;
 export type Session = Auth["$Infer"]["Session"]["session"];
 export type User = Auth["$Infer"]["Session"]["user"];

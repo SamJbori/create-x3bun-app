@@ -5,7 +5,6 @@ const envAuthSchema = envSchema.pick({
   BETTER_AUTH_SECRET: true,
   AUTH_DB_URL: true,
   AUTH_TABLE_NAME: true,
-  CF_TURNSTILE_SECRET_KEY: true,
   DOMAIN_NAME: true,
 });
 

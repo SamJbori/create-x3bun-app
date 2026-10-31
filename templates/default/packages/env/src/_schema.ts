@@ -22,9 +22,6 @@ export const envSchema = z.object({
   /** Server to Server API Call Token */
   SERVER_TOKEN: z.string(),
 
-  /** Turnstile because you should */
-  CF_TURNSTILE_SECRET_KEY: z.string().optional(),
-
   /** Used for proxy request */
   PROXY_SECRET: z.string(),
 

@@ -5,7 +5,6 @@ const env = getEnvAuth();
 
 export const getAuthPromise = () =>
   initAuth({
-    cfTurnstileKey: env.CF_TURNSTILE_SECRET_KEY,
     otpSend: async (data) => {
       // SMS sending logic
       console.log(data);

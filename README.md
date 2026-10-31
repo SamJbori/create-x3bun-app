@@ -71,7 +71,6 @@ bun run dev
   // Modify this function to integrate you SMS provider
   export const getAuthPromise = () =>
   initAuth({
-    cfTurnstileKey: env.CF_TURNSTILE_SECRET_KEY,
     otpSend: async (data) => {
       // SMS sending logic
       console.log(data);
