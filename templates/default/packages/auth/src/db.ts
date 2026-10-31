@@ -1,14 +1,12 @@
-import type { Db } from "mongodb";
+import type { Db } from "@x3bun/db";
+import { getDBClientPromise } from "@x3bun/db";
 import { getEnvAuth } from "@x3bun/env";
-import { MongoClient } from "mongodb";
 
 const env = getEnvAuth();
 
-let DBClientPromise: Promise<MongoClient> | undefined;
 let DB: Db | undefined;
 
 export const getDBPromise = async () => {
-	DBClientPromise ??= new MongoClient(env.AUTH_DB_URL).connect();
-	DB ??= (await DBClientPromise).db(env.AUTH_TABLE_NAME);
-	return DB;
+  DB ??= (await getDBClientPromise("auth")).db(env.AUTH_TABLE_NAME);
+  return DB;
 };

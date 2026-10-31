@@ -1,26 +1,23 @@
 {
-	"name": "@x3bun/api",
-	"type": "module",
-	"private": true,
-	"exports": {
-		".": "./src/_index.ts"
-	},
-	"scripts": {
-		"format": "biome format .",
-		"format:fix": "biome format . --write",
-		"lint": "biome check .",
-		"lint:fix": "biome check . --write",
-		"typecheck": "tsc --noEmit"
-	},
-	"devDependencies": {
-		"@types/bun": "latest",
-		"@x3bun/auth": "workspace:*",
-		"@x3bun/typescript": "workspace:*"
-	},
-	"dependencies": {
-		"@trpc/server": "latest",
-		"@x3bun/env": "workspace:*",
-		"superjson": "^2.2.6",
-		"zod": "^4.4.3"
-	}
+  "name": "@x3bun/api",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./src/_index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@x3bun/auth": "workspace:*",
+    "@x3bun/typescript": "workspace:*"
+  },
+  "dependencies": {
+    "@trpc/server": "latest",
+    "@x3bun/db": "workspace:*",
+    "@x3bun/env": "workspace:*",
+    "superjson": "^2.2.6",
+    "zod": "^4.6.7"
+  }
 }

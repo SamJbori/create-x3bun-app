@@ -1,4 +1,10 @@
 {
-	"extends": "@x3bun/typescript/react",
-	"include": ["src", "app", "vite.config.ts"]
+  "extends": "@x3bun/typescript/react",
+  "compilerOptions": {
+    "paths": {
+      "#/*": ["./src/*"],
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src", "app", "vite.config.ts"]
 }

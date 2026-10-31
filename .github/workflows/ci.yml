@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.4"
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Check CLI
+        run: bun run src/index.ts --help
+
+      - name: Check npm package contents
+        run: npm pack --dry-run
+
+      - name: Build package archive
+        run: npm pack --pack-destination "$RUNNER_TEMP"
+
+      - name: Test packed CLI
+        run: |
+          mkdir -p "$RUNNER_TEMP/consumer"
+          cd "$RUNNER_TEMP/consumer"
+
+          npm init -y
+
+          TARBALL=$(find "$RUNNER_TEMP" \
+            -maxdepth 1 \
+            -name "create-x3bun-app-*.tgz" \
+            -print -quit)
+
+          npm install "$TARBALL"
+
+          ./node_modules/.bin/create-x3bun-app --help

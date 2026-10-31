@@ -1,10 +1,50 @@
-import { getEnvDB } from "@x3bun/env";
-import { sql } from "bun";
-import { drizzle } from "drizzle-orm/bun-sql";
-import * as sch from "./drizzle/schema";
+import type { Collections, DBCollections } from "@x3bun/validators";
+import { DBCollectionStore } from "@x3bun/validators";
+import type { MongoClient, ObjectId } from "mongodb";
 
-const env = getEnvDB();
+export type { Db, MongoClient } from "mongodb";
+export { getDBClientPromise } from "./db";
 
-export const db = drizzle(sql, { schema: sch, logger: env.isDev });
+const dbCollection = <T extends DBCollections>(
+  dbClient: MongoClient,
+  collection: T,
+) => {
+  /**
+   * Based on the collection, direct the collection to use the correct db
+   */
+  const db = dbClient.db(DBCollectionStore[collection]);
 
-export const schema = sch;
+  return db.collection<Omit<Collections[T], "id">>(collection);
+};
+
+export const dbCollections = (dbClient: MongoClient) => {
+  return Object.fromEntries(
+    (Object.keys(DBCollectionStore) as DBCollections[]).map((collection) => [
+      collection,
+      dbCollection(dbClient, collection),
+    ]),
+  ) as {
+    [K in DBCollections]: ReturnType<typeof dbCollection<K>>;
+  };
+};
+
+/**
+ * Normolize the MongoDB object into a serializable object
+ * @param doc
+ * @returns
+ */
+export const fromDBToSingle = <T extends { _id: ObjectId }>(
+  doc: T,
+): Omit<T, "_id"> & { id: string } => {
+  const { _id, ...rest } = doc;
+  return {
+    ...rest,
+    id: _id.toString(),
+  };
+};
+
+export const fromDBToMany = <T extends { _id: ObjectId }>(
+  docs: T[],
+): (Omit<T, "_id"> & { id: string })[] => {
+  return docs.map(fromDBToSingle);
+};

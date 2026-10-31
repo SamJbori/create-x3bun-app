@@ -1,21 +1,21 @@
 import { envSchema } from "./_schema";
 
 const envServerSchema = envSchema.pick({
-	BETTER_AUTH_SECRET: true,
-	SERVER_TOKEN: true,
-	CF_TURNSTILE_SECRET_KEY: true,
-	PROXY_SECRET: true,
-	DOMAIN_NAME: true,
+  BETTER_AUTH_SECRET: true,
+  SERVER_TOKEN: true,
+  // CF_TURNSTILE_SECRET_KEY: true,
+  PROXY_SECRET: true,
+  // DOMAIN_NAME: true,
 });
 
 const envServerParse = () => ({
-	...envServerSchema.parse(process.env),
-	isDev: process.env.NODE_ENV === "development",
+  ...envServerSchema.parse(process.env),
+  isDev: process.env.NODE_ENV === "development",
 });
 
 let envServer: ReturnType<typeof envServerParse> | undefined;
 
 export const getEnvServer = () => {
-	envServer ??= envServerParse();
-	return envServer;
+  envServer ??= envServerParse();
+  return envServer;
 };

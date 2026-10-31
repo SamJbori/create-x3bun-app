@@ -1,25 +1,21 @@
 {
-	"name": "@x3bun/server",
-	"type": "module",
-	"private": true,
-	"scripts": {
-		"dev": "bun run --bun --hot --env-file=../../.env --port=3006 src/_index.ts ",
-		"format": "biome format .",
-		"format:fix": "biome format . --write",
-		"lint": "biome check .",
-		"lint:fix": "biome check . --write",
-		"typecheck": "tsc --noEmit"
-	},
-	"devDependencies": {
-		"@types/bun": "latest",
-		"@x3bun/auth": "workspace:*",
-		"@x3bun/typescript": "workspace:*"
-	},
-	"dependencies": {
-		"@hono/trpc-server": "0.4.2",
-		"@x3bun/api": "workspace:*",
-		"@x3bun/env": "workspace:*",
-		"hono": "4.12.23",
-		"zod": "^4.4.3"
-	}
+  "name": "@x3bun/server",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "bun run --bun --hot --env-file=../../.env --port=3006 src/_index.ts ",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@x3bun/auth": "workspace:*",
+    "@x3bun/typescript": "workspace:*"
+  },
+  "dependencies": {
+    "@hono/trpc-server": "0.4.2",
+    "@x3bun/api": "workspace:*",
+    "@x3bun/db": "workspace:*",
+    "@x3bun/env": "workspace:*",
+    "hono": "4.13.14"
+  }
 }

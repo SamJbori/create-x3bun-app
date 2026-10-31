@@ -1,4 +1,4 @@
 {
-	"extends": "@x3bun/typescript/server",
-	"include": ["src"]
+  "extends": "@x3bun/typescript/server",
+  "include": ["src"]
 }

@@ -1,42 +1,39 @@
+import babel from "@rolldown/plugin-babel";
 import tailwindcss from "@tailwindcss/vite";
 import { devtools } from "@tanstack/devtools-vite";
-import { tanstackRouter } from "@tanstack/router-plugin/vite";
-import viteReact from "@vitejs/plugin-react";
+import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import viteReact, { reactCompilerPreset } from "@vitejs/plugin-react";
+import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
-import biomePlugin from "vite-plugin-biome";
 
 const config = defineConfig({
-	ssr: {
-		target: "node",
-		optimizeDeps: {
-			include: ["@tanstack/react-router/ssr/server"],
-		},
-	},
-	envDir: "../../",
-	envPrefix: "X3BUN",
-	resolve: { tsconfigPaths: true },
-	plugins: [
-		devtools(),
-		tailwindcss(),
-		// tanstackStart({
-		// 	srcDirectory: "./app",
-		// 	// "dev": { "ssrStyles": { "enabled": true, } }
-		// }),
-		tanstackRouter({
-			target: "react",
-			autoCodeSplitting: true,
-			routesDirectory: "./app/routes",
-			generatedRouteTree: "./app/routeTree.gen.ts",
-		}),
-		viteReact(),
-		biomePlugin({
-			mode: "lint",
-			files: ".",
-			applyFixes: true,
-			failOnError: true,
-			forceColor: true,
-		}),
-	],
+  envDir: "../../",
+  envPrefix: "X3BUN",
+  resolve: { tsconfigPaths: true },
+  plugins: [
+    devtools(),
+    nitro({
+      rollupConfig: { external: [/^@sentry\//] },
+      routeRules: {
+        "/api/**": {
+          proxy: {
+            // biome-ignore lint: <Using env needed>
+            to: `${process.env.X3BUN_BE_URL!}/api/**`,
+            headers: {
+              // biome-ignore lint: <Using env needed>
+              "X-Proxy-Secret": process.env.PROXY_SECRET!,
+            },
+          },
+        },
+      },
+    }),
+    tailwindcss(),
+    tanstackStart({
+      srcDirectory: "./app",
+    }),
+    viteReact(),
+    babel({ presets: [reactCompilerPreset()] }),
+  ],
 });
 
 export default config;

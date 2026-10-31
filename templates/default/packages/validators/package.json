@@ -1,28 +1,20 @@
 {
-	"name": "@x3bun/validators",
-	"private": true,
-	"type": "module",
-	"exports": {
-		"./db": {
-			"import": "./src/db.ts"
-		},
-		"./post": {
-			"import": "./src/post.ts"
-		}
-	},
-	"scripts": {
-		"format": "biome format .",
-		"format:fix": "biome format . --write",
-		"lint": "biome check .",
-		"lint:fix": "biome check . --write",
-		"typecheck": "tsc --noEmit",
-		"exports": "bun run exportupdate.ts"
-	},
-	"dependencies": {
-		"zod": "^4.4.3"
-	},
-	"devDependencies": {
-		"@types/bun": "latest",
-		"@x3bun/typescript": "workspace:*"
-	}
+  "name": "@x3bun/validators",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./src/_index.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@x3bun/typescript": "workspace:*"
+  }
 }

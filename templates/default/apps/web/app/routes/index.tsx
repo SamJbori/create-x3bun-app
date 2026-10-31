@@ -1,32 +1,30 @@
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-export const Route = createFileRoute("/")({
-	component: Home,
-	loader: async ({ context: { trpc } }) =>
-		await trpc.client.post.getPost.query(),
-	// ssr: true,
-	// headers: () => ({
-	// 	// Cache at CDN for 1 hour, allow stale content for up to 1 day
-	// 	"Cache-Control":
-	// 		"public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400",
-	// }),
-});
+import { use } from "react";
+import { useTRPC } from "#/lib/trpc";
+
+export const Route = createFileRoute("/")({ component: Home });
+const fetchOk = fetch("http://localhost:3000/api/auth/ok").then(
+  (r) => r.json() as {},
+);
 
 function Home() {
-	// const posts = { data: Route.useLoaderData() };
-
-	const posts = Route.useRouteContext().trpc.api.post.getPost.useQuery();
-	const invalidatePosts =
-		Route.useRouteContext().trpc.api.useUtils().post.invalidate;
-	console.log(posts.data);
-	return (
-		<div className="p-8">
-			<h1 className="text-4xl font-bold">Welcome to TanStack Start</h1>
-			<p className="mt-4 text-lg">
-				Edit <code>src/routes/index.tsx</code> to get started.
-			</p>
-			<button type="button" onClick={() => invalidatePosts()}>
-				Invalidate Post {posts.data?.id}
-			</button>
-		</div>
-	);
+  const trpc = useTRPC();
+  const { data } = useQuery(trpc.post.getPost.queryOptions());
+  const authOK = use(fetchOk);
+  return (
+    <div className="p-8" suppressHydrationWarning>
+      <h1 className="text-4xl font-bold">Welcome to X3Bun Starter App</h1>
+      <p className="mt-4 text-lg">If you see JSON object below, tRPC works </p>
+      <pre className="bg-accent p-3 rounded">
+        <code>{JSON.stringify(data, null, 2)}</code>
+      </pre>
+      <p className="mt-4 text-lg">
+        If you see JSON object below, Better-Auth works{" "}
+      </p>
+      <pre className="bg-accent p-3 rounded">
+        <code>{JSON.stringify(authOK, null, 2)}</code>
+      </pre>
+    </div>
+  );
 }

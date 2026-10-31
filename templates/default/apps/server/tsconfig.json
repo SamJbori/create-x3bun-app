@@ -1,4 +1,8 @@
 {
-	"extends": "@x3bun/typescript/server",
-	"include": ["src"]
+  "extends": "@x3bun/typescript/server",
+  "include": [
+    "src",
+    "../../packages/db/src/db.ts",
+    "../../packages/auth/src/auth.ts"
+  ]
 }

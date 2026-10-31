@@ -1,56 +1,63 @@
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
-import type { Auth, AuthData } from "@x3bun/auth";
 import { initTRPC, TRPCError } from "@trpc/server";
+import type { Auth, AuthData } from "@x3bun/auth";
+import type { dbCollections } from "@x3bun/db";
 import { getEnvServer } from "@x3bun/env";
-import superjson from "superjson";
-import z, { ZodError } from "zod/v4";
+import SuperJSON from "superjson";
+import { ZodError, z } from "zod/v4";
 import { postRouter } from "./routers/post";
 
 const env = getEnvServer();
 
 export const createTRPCContext = ({
-	headers,
-	authData,
-	auth,
+  headers,
+  authData,
+  auth,
+  db,
+  // storage
 }: {
-	headers: Headers;
-	authData: AuthData;
-	auth: Auth;
+  headers: Headers;
+  authData: AuthData;
+  auth: Auth;
+  db: ReturnType<typeof dbCollections>;
+  // storage: Bun.S3Client
 }) => {
-	return {
-		auth,
-		user: authData?.user,
-		headers,
-	};
+  return {
+    headers,
+    auth,
+    user: authData?.user,
+    db,
+    // storage
+  };
 };
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
-	transformer: superjson,
-	errorFormatter: ({ shape, error }) => ({
-		...shape,
-		data: {
-			...shape.data,
-			zodError:
-				error.cause instanceof ZodError
-					? z.flattenError(error.cause as ZodError<Record<string, unknown>>)
-					: null,
-		},
-	}),
+  transformer: SuperJSON,
+  errorFormatter: ({ shape, error }) => ({
+    ...shape,
+    data: {
+      ...shape.data,
+      zodError:
+        error.cause instanceof ZodError
+          ? z.flattenError(error.cause as ZodError<Record<string, unknown>>)
+          : null,
+    },
+  }),
 });
 
 export const createTRPCRouter = t.router;
 
 const trpcMiddleware = t.middleware(async ({ next, path }) => {
-	if (env.isDev) {
-		const start = Date.now();
-		const result = await next();
-		const end = Date.now();
-		console.log(`[TRPC] ${path} took ${end - start}ms to execute`);
-		return result;
-	}
+  if (env.isDev) {
+    const start = Date.now();
+    const result = await next();
+    const end = Date.now();
+    console.log(`[TRPC] ${path} took ${end - start}ms to execute`);
+    return result;
+  }
 
-	const result = await next();
-	return result;
+  const result = await next();
+  return result;
 });
 
 /**
@@ -62,79 +69,79 @@ const publicProcedure = t.procedure.use(trpcMiddleware);
  * Protected (anonymous authentication) procedure
  */
 const anonymousProcedure = publicProcedure.use(({ ctx, next }) => {
-	if (!ctx.user) {
-		throw new TRPCError({ code: "UNAUTHORIZED" });
-	}
-	return next({
-		ctx: {
-			// infers the `session` as non-nullable
-			user: ctx.user,
-			userId: ctx.user.id,
-		},
-	});
+  if (!ctx.user) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+  return next({
+    ctx: {
+      // infers the `session` as non-nullable
+      user: ctx.user,
+      userId: ctx.user.id,
+    },
+  });
 });
 
 /**
  * Protected (LoggedIn users) procedure
  */
 const loggedinProcedure = publicProcedure.use(({ ctx, next }) => {
-	if (!ctx.user || ctx.user.isAnonymous) {
-		throw new TRPCError({ code: "UNAUTHORIZED" });
-	}
-	return next({
-		ctx: {
-			// infers the `session` as non-nullable
-			user: ctx.user,
-			userId: ctx.user.id,
-		},
-	});
+  if (!ctx.user || ctx.user.isAnonymous) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+  return next({
+    ctx: {
+      // infers the `session` as non-nullable
+      user: ctx.user,
+      userId: ctx.user.id,
+    },
+  });
 });
 
 /**
  * Platform Admins Only
  */
 const adminProcedure = publicProcedure.use(({ ctx, next }) => {
-	if (!ctx.user?.isAdmin) {
-		throw new TRPCError({ code: "UNAUTHORIZED" });
-	}
-	return next({
-		ctx: {
-			// infers the `session` and `token`  as non-nullable
-			user: { ...ctx.user },
-			userId: ctx.user.id,
-		},
-	});
+  if (!ctx.user?.isAdmin) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+  return next({
+    ctx: {
+      // infers the `session` and `token`  as non-nullable
+      user: { ...ctx.user },
+      userId: ctx.user.id,
+    },
+  });
 });
 
 /**
  * SSR Authentication
  */
 const serverProcedure = publicProcedure.use(async ({ ctx, next }) => {
-	const headerToken = ctx.headers.get("X-Server-Token");
-	if (!headerToken) {
-		throw new TRPCError({ code: "UNAUTHORIZED" });
-	}
+  const headerToken = ctx.headers.get("X-Server-Token");
+  if (!headerToken) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
 
-	if (env.SERVER_TOKEN !== headerToken) {
-		throw new TRPCError({ code: "UNAUTHORIZED" });
-	}
+  if (env.SERVER_TOKEN !== headerToken) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
 
-	return next();
+  return next();
 });
 
 const procedures = {
-	router: t.router,
-	publicProcedure,
-	anonymousProcedure,
-	loggedinProcedure,
-	adminProcedure,
-	serverProcedure,
+  router: t.router,
+  publicProcedure,
+  anonymousProcedure,
+  loggedinProcedure,
+  adminProcedure,
+  serverProcedure,
 };
 
 export type TRPCProcedures = typeof procedures;
 
 export const appRouter = createTRPCRouter({
-	post: postRouter(procedures),
+  post: postRouter(procedures),
 });
 
 // export type definition of API

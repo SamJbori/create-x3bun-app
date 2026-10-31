@@ -1,0 +1,75 @@
+name: Publish to npm
+
+on:
+    push:
+        tags:
+            - "v*"
+
+permissions:
+    contents: read
+    id-token: write
+
+jobs:
+    publish:
+        name: Validate and Publish
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Bun
+              uses: oven-sh/setup-bun@v2
+              with:
+                  bun-version: "1.4.4"
+
+            - name: Install dependencies
+              run: bun install
+
+            - name: Validate CLI
+              run: bun run src/index.ts --help
+
+            - name: Verify version
+              shell: bash
+              run: |
+                  PACKAGE_VERSION=$(node -p \
+                    "require('./package.json').version")
+
+                  TAG_VERSION="${GITHUB_REF_NAME#v}"
+
+                  if [ "$PACKAGE_VERSION" != "$TAG_VERSION" ]; then
+                    echo "Version mismatch!"
+                    echo "package.json: $PACKAGE_VERSION"
+                    echo "Git tag: $TAG_VERSION"
+                    exit 1
+                  fi
+
+            - name: Verify package contents
+              run: npm pack --dry-run
+
+            - name: Test packed CLI
+              run: |
+                  mkdir -p "$RUNNER_TEMP/consumer"
+                  npm pack --pack-destination "$RUNNER_TEMP"
+
+                  cd "$RUNNER_TEMP/consumer"
+                  npm init -y
+
+                  TARBALL=$(find "$RUNNER_TEMP" \
+                    -maxdepth 1 \
+                    -name "create-x3bun-app-*.tgz" \
+                    -print -quit)
+
+                  npm install "$TARBALL"
+                  ./node_modules/.bin/create-x3bun-app --help
+
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "24"
+
+            - name: Update npm
+              run: npm install --global npm@latest
+
+            - name: Publish to npm
+              run: npm publish --provenance --access public

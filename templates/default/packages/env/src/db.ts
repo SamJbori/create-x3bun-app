@@ -1,15 +1,15 @@
 import { envSchema } from "./_schema";
 
-const envDBSchema = envSchema.pick({ DATABASE_URL: true });
+const envDBSchema = envSchema.pick({ DATABASE_URL: true, AUTH_DB_URL: true });
 
 const envDBParse = () => ({
-	...envDBSchema.parse(process.env),
-	isDev: process.env.NODE_ENV === "development",
+  ...envDBSchema.parse(process.env),
+  isDev: process.env.NODE_ENV === "development",
 });
 
 let envDB: ReturnType<typeof envDBParse> | undefined;
 
 export const getEnvDB = () => {
-	envDB ??= envDBParse();
-	return envDB;
+  envDB ??= envDBParse();
+  return envDB;
 };

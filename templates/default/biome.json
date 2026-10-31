@@ -15,29 +15,31 @@
 			"**/vite.config.ts",
 			"**/tsconfig.ts",
 			"**/*.json",
-			"!**/app/routeTree.gen.ts",
+			"!**/routeTree.gen.ts",
 			"!**/app/styles.css"
 		]
 	},
 	"formatter": {
 		"enabled": true,
-		"indentStyle": "tab"
+		"indentStyle": "space",
+		"indentWidth": 2
 	},
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true,
-			"suspicious": { "noNonNullAssertedOptionalChain": "info" },
+			"preset": "recommended",
+			"suspicious": {
+				"noNonNullAssertedOptionalChain": "info",
+				"noUndeclaredEnvVars": "error"
+			},
 			"a11y": {
 				"useSemanticElements": "warn",
 				"useKeyWithClickEvents": "warn"
 			},
 			"nursery": {
-				"noUndeclaredEnvVars": "error",
 				"useAwaitThenable": "warn",
 				"noFloatingPromises": "error"
 			},
-
 			"style": {
 				"noNonNullAssertion": "info",
 				"noProcessEnv": "error",
@@ -88,14 +90,14 @@
 	"assist": {
 		"enabled": true,
 		"actions": {
-			"recommended": true,
+			"preset": "recommended",
 			"source": {
-				"recommended": true,
+				"preset": "recommended",
 				"useSortedInterfaceMembers": "on",
 				"organizeImports": {
 					"level": "on",
 					"options": {
-						"groups": [{ "type": true }]
+						"groups": ["type"]
 					}
 				}
 			}
