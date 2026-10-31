@@ -1,0 +1,118 @@
+{
+  "$schema": "https://biomejs.dev/schemas/latest/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": false,
+    "includes": [
+      "**/src/**/*",
+      "**/app/**/*",
+      "**/.vscode/**/*",
+      "!**/index.html",
+      "**/vite.config.ts",
+      "**/tsconfig.ts",
+      "**/*.json",
+      "!**/routeTree.gen.ts",
+      "!**/app/styles.css"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "recommended",
+      "suspicious": {
+        "noNonNullAssertedOptionalChain": "info",
+        "noUndeclaredEnvVars": "error"
+      },
+      "a11y": {
+        "useSemanticElements": "warn",
+        "useKeyWithClickEvents": "warn"
+      },
+      "nursery": {
+        "useAwaitThenable": "warn",
+        "noFloatingPromises": "error"
+      },
+      "style": {
+        "noNonNullAssertion": "info",
+        "noProcessEnv": "error",
+        "useNodejsImportProtocol": "off",
+        "noRestrictedImports": {
+          "level": "error",
+          "options": {
+            "paths": {
+              "zod": {
+                "message": "Use \"zod/v4\" instead",
+                "allowImportNames": ["zod/v4"]
+              }
+            }
+          }
+        },
+        "useImportType": {
+          "level": "error",
+          "options": {
+            "style": "separatedType"
+          }
+        }
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double",
+      "semicolons": "always",
+      "trailingCommas": "all"
+    },
+    "linter": {
+      "enabled": true
+    }
+  },
+  "json": {
+    "formatter": {
+      "enabled": true
+    },
+    "linter": {
+      "enabled": true
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "preset": "recommended",
+      "source": {
+        "preset": "recommended",
+        "useSortedInterfaceMembers": "on",
+        "organizeImports": {
+          "level": "on",
+          "options": {
+            "groups": ["type"]
+          }
+        }
+      }
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["**/packages/env/**/*.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noProcessEnv": "off"
+          }
+        }
+      }
+    }
+  ]
+}

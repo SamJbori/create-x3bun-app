@@ -4,8 +4,8 @@ import { use } from "react";
 import { useTRPC } from "#/lib/trpc";
 
 export const Route = createFileRoute("/")({ component: Home });
-const fetchOk = fetch("http://localhost:3000/api/auth/ok").then(
-  (r) => r.json() as {},
+const fetchOk = fetch("http://localhost:3000/api/auth/ok").then((r) =>
+  r.json(),
 );
 
 function Home() {

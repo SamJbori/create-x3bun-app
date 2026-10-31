@@ -1,45 +1,36 @@
 {
-	"$schema": "https://turborepo.dev/schema.json",
-	"ui": "tui",
-	"tasks": {
-		"//#clean": {
-			"cache": false
-		},
-		"dev": {
-			"cache": false,
-			"persistent": true
-		},
-		"format": {
-			"outputs": [".cache/.biomefmtcache"],
-			"outputLogs": "new-only"
-		},
-		"lint": {
-			"dependsOn": ["^lint"],
-			"outputs": [".cache/.biomelintcache"]
-		},
-
-		"typecheck": {
-			"dependsOn": ["^typecheck"],
-			"outputs": [".cache/tsbuildinfo.json"]
-		}
-	},
-	"globalEnv": ["X3BUN_BE_URL"],
-	"globalPassThroughEnv": [
-		"NODE_ENV",
-		"DEV",
-		"MODE",
-		"CI",
-		"DATABASE_URL",
-		"BETTER_AUTH_URL",
-		"BETTER_AUTH_SECRET",
-		"AUTH_DB_URL",
-		"AUTH_TABLE_NAME",
-		"S3_ACCESS_KEY_ID",
-		"S3_SECRET_ACCESS_KEY",
-		"S3_REGION",
-		"S3_ENDPOINT",
-		"CF_TURNSTILE_SECRET_KEY",
-		"SERVER_TOKEN",
-		"PROXY_SECRET"
-	]
+  "$schema": "https://turborepo.dev/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "//#clean": {
+      "cache": false
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck"],
+      "outputs": [".cache/tsbuildinfo.json"]
+    }
+  },
+  "globalEnv": ["X3BUN_BE_URL"],
+  "globalPassThroughEnv": [
+    "NODE_ENV",
+    "DEV",
+    "MODE",
+    "CI",
+    "DATABASE_URL",
+    "BETTER_AUTH_URL",
+    "BETTER_AUTH_SECRET",
+    "AUTH_DB_URL",
+    "AUTH_TABLE_NAME",
+    "S3_ACCESS_KEY_ID",
+    "S3_SECRET_ACCESS_KEY",
+    "S3_REGION",
+    "S3_ENDPOINT",
+    "CF_TURNSTILE_SECRET_KEY",
+    "SERVER_TOKEN",
+    "PROXY_SECRET"
+  ]
 }

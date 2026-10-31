@@ -1,62 +1,62 @@
 {
-	"name": "create-x3bun-app",
-	"version": "0.2.101",
-	"description": "Quickest way to start a new web/mobile app with full stack typesafety",
-	"author": "Wisam Hayder<wisam.hayder@outlook.com> (https://www.linkedin.com/in/wisamhayder/)",
-	"maintainers": [
-		"Wisam Hayder<wisam.hayder@outlook.com> (https://www.linkedin.com/in/wisamhayder/)"
-	],
-	"license": "MIT",
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/SamJbori/create-x3bun-app.git"
-	},
-	"homepage": "https://github.com/SamJbori/create-x3bun-app#readme",
-	"keywords": [
-		"create-x3bun-app",
-		"create-t3-app",
-		"nextjs",
-		"next.js",
-		"x3bun-stack",
-		"t3-stack",
-		"tailwind",
-		"tRPC",
-		"typescript",
-		"bun",
-		"expo",
-		"react-native",
-		"react",
-		"web",
-		"mobile",
-		"fullstack",
-		"typescript",
-		"starter",
-		"template",
-		"cli",
-		"scaffolding",
-		"boilerplate",
-		"tailwindcss",
-		"react-query",
-		"tanstack-router",
-		"tanstack-react-query",
-		"tanstack",
-		"tanstack start",
-		"hone",
-		"vite"
-	],
-	"type": "module",
-	"bin": {
-		"create-x3bun-app": "src/index.ts"
-	},
-	"files": [
-		"src",
-		"templates",
-		"config.json"
-	],
-	"devDependencies": {
-		"@types/bun": "latest"
-	},
-	"engines": {
-		"bun": "1.4.4"
-	}
+  "name": "create-x3bun-app",
+  "version": "0.2.101",
+  "description": "Quickest way to start a new web/mobile app with full stack typesafety",
+  "author": "Wisam Hayder<wisam.hayder@outlook.com> (https://www.linkedin.com/in/wisamhayder/)",
+  "maintainers": [
+    "Wisam Hayder<wisam.hayder@outlook.com> (https://www.linkedin.com/in/wisamhayder/)"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SamJbori/create-x3bun-app.git"
+  },
+  "homepage": "https://github.com/SamJbori/create-x3bun-app#readme",
+  "keywords": [
+    "create-x3bun-app",
+    "create-t3-app",
+    "nextjs",
+    "next.js",
+    "x3bun-stack",
+    "t3-stack",
+    "tailwind",
+    "tRPC",
+    "typescript",
+    "bun",
+    "expo",
+    "react-native",
+    "react",
+    "web",
+    "mobile",
+    "fullstack",
+    "typescript",
+    "starter",
+    "template",
+    "cli",
+    "scaffolding",
+    "boilerplate",
+    "tailwindcss",
+    "react-query",
+    "tanstack-router",
+    "tanstack-react-query",
+    "tanstack",
+    "tanstack start",
+    "hone",
+    "vite"
+  ],
+  "type": "module",
+  "bin": {
+    "create-x3bun-app": "src/index.ts"
+  },
+  "files": [
+    "src",
+    "templates",
+    "config.json"
+  ],
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "engines": {
+    "bun": "1.4.4"
+  }
 }

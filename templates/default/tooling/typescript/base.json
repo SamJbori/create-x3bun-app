@@ -1,32 +1,32 @@
 {
-	"$schema": "https://json.schemastore.org/tsconfig",
+  "$schema": "https://json.schemastore.org/tsconfig",
 
-	"compilerOptions": {
-		"target": "ESNext",
+  "compilerOptions": {
+    "target": "ESNext",
 
-		"module": "ESNext",
-		"moduleResolution": "Bundler",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
 
-		"strict": true,
-		"noUncheckedIndexedAccess": true,
-		"exactOptionalPropertyTypes": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
 
-		"isolatedModules": true,
-		"moduleDetection": "force",
-		"verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "verbatimModuleSyntax": true,
 
-		"allowSyntheticDefaultImports": true,
-		"esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
 
-		"resolveJsonModule": true,
+    "resolveJsonModule": true,
 
-		"skipLibCheck": true,
+    "skipLibCheck": true,
 
-		"noEmit": true,
-		"noImplicitAny": true,
+    "noEmit": true,
+    "noImplicitAny": true,
 
-		"noFallthroughCasesInSwitch": true,
-		"noUncheckedSideEffectImports": true,
-		"allowImportingTsExtensions": true
-	}
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    "allowImportingTsExtensions": true
+  }
 }

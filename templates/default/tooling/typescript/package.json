@@ -1,13 +1,13 @@
 {
-	"name": "@x3bun/typescript",
-	"private": true,
-	"exports": {
-		"./base": "./base.json",
-		"./server": "./server.json",
-		"./react": "./react.json"
-	},
-	"devDependencies": {
-		"@types/bun": "latest",
-		"typescript": "7.0.2"
-	}
+  "name": "@x3bun/typescript",
+  "private": true,
+  "exports": {
+    "./base": "./base.json",
+    "./server": "./server.json",
+    "./react": "./react.json"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "7.0.2"
+  }
 }
