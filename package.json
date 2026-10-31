@@ -1,6 +1,6 @@
 {
 	"name": "create-x3bun-app",
-	"version": "0.2.1-p001",
+	"version": "0.2.1",
 	"description": "Quickest way to start a new web/mobile app with full stack typesafety",
 	"author": "Wisam Hayder<wisam.hayder@outlook.com> (https://www.linkedin.com/in/wisamhayder/)",
 	"maintainers": [
