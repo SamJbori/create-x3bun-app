@@ -43,6 +43,8 @@ app.use(
       "x-trpc-source",
       "trpc-accept",
       "x-captcha-response",
+      "X-Proxy-Secret",
+      "X-Server-Token",
       // Add any other headers you want to allow here
     ],
     allowMethods: ["POST", "GET", "OPTIONS"],
