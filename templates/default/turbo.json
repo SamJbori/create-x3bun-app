@@ -12,7 +12,9 @@
     "typecheck": {
       "dependsOn": ["^typecheck"],
       "outputs": [".cache/tsbuildinfo.json"]
-    }
+    },
+    "format": {},
+    "lint": {}
   },
   "globalEnv": ["X3BUN_BE_URL"],
   "globalPassThroughEnv": [

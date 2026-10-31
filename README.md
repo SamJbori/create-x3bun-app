@@ -92,6 +92,22 @@ bun run dev
     },
   });
   ```
+  
+  ```typescript
+  # /apps/server/src/_index.ts
+
+  // Remove Proxy security guards ((ALL))
+  app.use("*", async (c, next) => {
+    const secret = c.req.header("X-Proxy-Secret");
+
+    if (secret !== env.PROXY_SECRET) {
+      return c.json({ error: "Unauthorized proxy" }, 401);
+    }
+
+    await next();
+  });
+  ``` 
+  
 
 - **API**\
   Built with **[tRPC](https://trpc.io/)**, enabling a fully type-safe RPC-based
@@ -110,6 +126,7 @@ bun run dev
   }
 
   ```
+  don't forget to remove the proxy guard.
 
 - **State Management**\
   Powered by **[React Query](https://tanstack.com/query/latest)** for efficient
@@ -233,7 +250,7 @@ version updates will be applied as needed.
 
 <a href="https://github.com/SamJbori/create-x3bun-app/graphs/contributors" align="center">
 	<p align="center">
-		<img src="https://contrib.rocks/image?repo=SamJbori/create-x3bun-app" alt="A table of avatars from the project's contributors" align="center"/>
+		<img src="https://contrib.rocks/image?repo=SamJbori/create-x3bun-app" align="center" alt="A table of avatars from the project's contributors"/>
 	</p>
 </a>
 
